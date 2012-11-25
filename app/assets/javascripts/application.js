@@ -4,15 +4,15 @@
 //= require jquery.timers
 //= require jquery.cookie
 //= require augment
-//= require openlayers
+//= require leaflet
+//= require leaflet.osm
+//= require leaflet.locationfilter
+//= require leaflet.pan
+//= require leaflet.zoom
 //= require i18n/translations
-//= require globals
-//= require params
+//= require osm
 //= require piwik
-//= require browse
-//= require export
 //= require map
-//= require key
 //= require menu
 //= require sidebar
 //= require richtext
@@ -29,7 +29,7 @@ function zoomPrecision(zoom) {
  * Called as the user scrolls/zooms around to aniplate hrefs of the
  * view tab and various other links
  */
-function updatelinks(lon,lat,zoom,layers,minlon,minlat,maxlon,maxlat,objtype,objid) {
+function updatelinks(lon,lat,zoom,layers,minlon,minlat,maxlon,maxlat,object) {
   var toPrecision = zoomPrecision(zoom);
   var node;
 
@@ -58,8 +58,8 @@ function updatelinks(lon,lat,zoom,layers,minlon,minlat,maxlon,maxlat,objtype,obj
       args.layers = layers;
     }
 
-    if (objtype && $(link).hasClass("object")) {
-      args[objtype] = objid;
+    if (object && $(link).hasClass("object")) {
+      args[object.type] = object.id;
     }
 
     var minzoom = $(link).data("minzoom");
@@ -87,8 +87,8 @@ function updatelinks(lon,lat,zoom,layers,minlon,minlat,maxlon,maxlat,objtype,obj
     var prefix = shortlinkPrefix();
 
     // Add ?{node,way,relation}=id to the arguments
-    if (objtype && objid) {
-      args[objtype] = objid;
+    if (object) {
+      args[object.type] = object.id;
     }
 
     // This is a hack to omit the default mapnik layer from the shortlink.
@@ -103,7 +103,7 @@ function updatelinks(lon,lat,zoom,layers,minlon,minlat,maxlon,maxlat,objtype,obj
     // ?{node,way,relation}= can be safely omitted from the shortlink
     // which encodes lat/lon/zoom. If new URL parameters are added to
     // the main slippy map this needs to be changed.
-    if (args.layers || args[objtype]) {
+    if (args.layers || object) {
       this.href = setArgs(prefix + "/go/" + code, args);
     } else {
       this.href = prefix + "/go/" + code;

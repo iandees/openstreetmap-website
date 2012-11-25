@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%= I18n.locale %>" lang="<%= I18n.locale %>" dir="<%= t'html.dir' %>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%= I18n.locale %>" lang="<%= I18n.locale %>" dir="<%= dir %>">
   <%= render :partial => "layouts/head" %>
   <body class="<%= params[:controller] %> <%= params[:controller] %>-<%= params[:action] %>">
     <div id="small-title">
@@ -13,8 +13,8 @@
     <div id='top-bar'>
       <span id="greeting">
          <% if @user and @user.id %>
-           <span id="full-greeting"><%= raw(t 'layouts.welcome_user', :user_link => (link_to h(@user.display_name), user_path(:display_name => @user.display_name), :title => t('layouts.welcome_user_link_tooltip'))) %></span> 
-           <span id="small-greeting"><%= link_to t('layouts.welcome_user_link_tooltip'), user_path(:display_name => @user.display_name) %></span> | 
+           <span id="full-greeting"><%= raw(t 'layouts.welcome_user', :user_link => (link_to h(@user.display_name), user_path(:display_name => @user.display_name), :title => t('layouts.welcome_user_link_tooltip'))) %></span>
+           <span id="small-greeting"><%= link_to t('layouts.welcome_user_link_tooltip'), user_path(:display_name => @user.display_name) %></span> |
            <%= yield :greeting %>
            <%= render :partial => "layouts/inbox" %> |
            <%= link_to t('layouts.logout'), logout_path(:session => request.session_options[:id], :referer => request.fullpath), {:id => 'logoutanchor', :title => t('layouts.logout_tooltip')}%>
@@ -32,7 +32,7 @@
         <li><%= link_to h(t('layouts.edit')) + content_tag(:span, "▾", :class => "menuicon"), edit_path, {
           :id => 'editanchor',
           :title => t('javascripts.site.edit_tooltip'),
-          :data => { :minzoom => 13 },
+          :data => { :minzoom => 13, :editor => preferred_editor },
           :class => 'geolink llz object disabled'
         } %></li>
         <li><%= link_to t('layouts.history'), browse_changesets_path, {
@@ -44,17 +44,18 @@
         <li><%= link_to t('layouts.export'), export_path, {
           :id => 'exportanchor',
           :title => t('layouts.export_tooltip'),
+          :data => { :url => url_for(:controller => :export, :action => :start) },
           :class => 'geolink llz layers'
         } %></li>
       </ul>
     </div>
     <div id="editmenu" class="menu">
       <ul>
-        <% Editors::ALL_EDITORS.each do |editor| %>
+        <% Editors::RECOMMENDED_EDITORS.each do |editor| %>
           <li><%= link_to t('layouts.edit_with',
             :editor => t("editor.#{editor}.description")),
             edit_path(:editor => editor), {
-            :id => editor + 'anchor',
+            :data => { :editor => editor },
             :class => "geolink llz object"
           } %></li>
         <% end %>
@@ -69,7 +70,7 @@
         <%= link_to(image_tag("osm_logo.png",
           :size => "120x120",
           :alt => t('layouts.logo.alt_text')),
-          root_path) %><br/>
+          root_path) %>
         <h1><%= t 'layouts.project_name.h1' %></h1>
         <h2 class="nowrap"><%= t('layouts.tag_line') %></h2>
       </div>
@@ -101,40 +102,36 @@
         <p><%= raw t 'layouts.donate', :link => "<a href=\"http://donate.openstreetmap.org/\">#{t('layouts.donate_link_text')}</a>" %></p>
       </div>
       <% end %>
-      <div id="left_menu" class="left_menu">
-        <ul>
-          <li><%= t'layouts.help' %>
-            <ul>
+      <ul id="left_menu" class="left_menu">
+        <li>
+          <h4><%= t'layouts.help' %></h4>
+          <ul>
             <li><%= link_to(t('layouts.help_centre'), t('layouts.help_url'), :title => t('layouts.help_title')) %></li>
             <li><%= link_to(t('layouts.documentation'), t('layouts.wiki_url'), :title => t('layouts.documentation_title')) %></li>
             <li><%= link_to t('layouts.copyright'), copyright_path %></li>
-            </ul>
-          </li>
-          <li><%= t'layouts.community' %>
-            <ul>
+          </ul>
+        </li>
+        <li>
+          <h4><%= t'layouts.community' %></h4>
+          <ul>
             <li><a href="http://blogs.openstreetmap.org/" title="<%= t 'layouts.community_blogs_title' %>"><%= t 'layouts.community_blogs' %></a></li>
             <li><a href="http://www.osmfoundation.org" title="<%= t 'layouts.foundation_title' %>"><%= t 'layouts.foundation' %></a></li>
             <li><%= link_to(t('layouts.user_diaries'), diary_path, {
               :title => t('layouts.user_diaries_tooltip')
             }) %></li>
-            </ul>
-          </li>
-          <li><%= link_to t('layouts.gps_traces'), traces_path, {
+          </ul>
+        </li>
+        <li>
+          <h4><%= link_to t('layouts.gps_traces'), traces_path, {
             :id => 'traceanchor',
             :title => t('layouts.gps_traces_tooltip')
-          } %></li>
-          <%= yield :left_menu %>
-        </ul>
-      </div>
-      <div id="sotm">
-        <%= link_to image_tag("sotmpdx.png",
-          :alt => t('layouts.sotm2012'),
-          :title => t('layouts.sotm2012'),
-          :border => "0"), "http://stateofthemap.us/" %>
-      </div>
-      <div class="donate">
-        <a href="http://donate.openstreetmap.org/" title="<%= h(t('layouts.make_a_donation.title')) %>"><%= h(t('layouts.make_a_donation.text')) %></a>
-      </div>
+          } %></h4>
+        </li>
+        <%= yield :left_menu %>
+      </ul>
+      <a title="<%= h(t('layouts.make_a_donation.title')) %>" href="http://donate.openstreetmap.org/" class="donate">
+        <span class='donate-icon'></span><p><%= h(t('layouts.make_a_donation.text')) %></p>
+      </a>
       <div class='sidebar-copy'>
         <p class='deemphasize'><%= t 'layouts.partners_html',
           :ucl => link_to(t('layouts.partners_ucl'), "http://www.vr.ucl.ac.uk"),

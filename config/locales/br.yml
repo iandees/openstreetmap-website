@@ -396,7 +396,7 @@ br:
       area_to_export: Takad da ezporzhiañ
       embeddable_html: HTML enkorfadus
       export_button: Ezporzhiañ
-      export_details: Roadennoù OpenStreetMap zo dindan an aotre-implijout <a href="http://creativecommons.org/licenses/by-sa/2.0/">Creative Commons Attribution-ShareAlike 2.0</a>.
+      export_details: Roadennoù OpenStreetMap zo dindan an aotre-implijout <a href="http://opendatacommons.org/licenses/odbl/1.0/">Open Data Commons Open Database License</a> (ODbL).
       format: Furmad
       format_to_export: Furmad da ezporzhiañ
       image_size: Ment ar skeudenn
@@ -427,14 +427,11 @@ br:
     description: 
       title: 
         geonames: Lec'hiadur diwar <a href="http://www.geonames.org/">GeoNames</a>
-        osm_namefinder: "%{types} diwar <a href=\"http://gazetteer.openstreetmap.org/namefinder/\">OpenStreetMap Namefinder</a>"
         osm_nominatim: Lec'hiadur adalek <a href="http://nominatim.openstreetmap.org/">OpenStreetMap Nominatim</a>
       types: 
         cities: Keodedoù
         places: Lec'hioù
         towns: Kêrioù
-    description_osm_namefinder: 
-      prefix: "%{distance} %{direction} eus %{type}"
     direction: 
       east: reter
       north: norzh
@@ -456,13 +453,9 @@ br:
         ca_postcode: Disoc'hoù diwar <a href="http://geocoder.ca/">Geocoder.CA</a>
         geonames: Disoc'hoù diwar <a href="http://www.geonames.org/">GeoNames</a>
         latlon: Disoc'hoù diwar <a href="http://openstreetmap.org/">Internal</a>
-        osm_namefinder: Disoc'hoù diwar <a href="http://gazetteer.openstreetmap.org/namefinder/">OpenStreetMap Namefinder</a>
         osm_nominatim: Disoc'hoù diwar <a href="http://nominatim.openstreetmap.org/">OpenStreetMap Nominatim</a>
         uk_postcode: Disoc'hoù diwar <a href="http://www.npemap.org.uk/">NPEMap / FreeThe Postcode</a>
         us_postcode: Disoc'hoù diwar <a href="http://geocoder.us/">Geocoder.us</a>
-    search_osm_namefinder: 
-      suffix_parent: "%{suffix} (%{parentdistance} %{parentdirection} eus %{parentname})"
-      suffix_place: " %{distance} %{direction} diouzh %{placename}"
     search_osm_nominatim: 
       prefix: 
         aeroway: 
@@ -1007,24 +1000,32 @@ br:
       text: Ma vez digendalc'h etre ar bajenn troet-mañ hag %{english_original_link} e teuio ar bajenn saoznek da gentañ
       title: Diwar-benn an droidigezh-mañ
     legal_babble: 
+      attribution_example: 
+        alt: Skouer eus penaos deverkañ OpenStreetMap war ur bajenn web
+        title: Skouer deverkadur
       contributors_at_html: "<strong>Aostria</strong> : Ennañ roadennoù eus\n<a href=\"http://data.wien.gv.at/\">Stadt Wien</a> (dindan\n<a href=\"http://creativecommons.org/licenses/by/3.0/at/deed.de\">CC BY</a>.</li> \t\n<a href=\"http://creativecommons.org/licenses/by/3.0/at/deed.de\">CC BY</a>), \n<a href=\"http://www.vorarlberg.at/vorarlberg/bauen_wohnen/bauen/vermessung_geoinformation/weitereinformationen/services/wmsdienste.htm\">Land Vorarlberg</a> ha\nLand Tirol (dindan <a href=\"http://www.tirol.gv.at/applikationen/e-government/data/nutzungsbedingungen/\">CC-BY AT gant enkemmadoù</a>)."
       contributors_ca_html: "<strong>Kanada</strong> : Ennañ roadennoù eus\n   GeoBase&reg;, GeoGratis (&copy; Department of Natural\n   Resources Canada), CanVec (&copy; Department of Natural\n   Resources Canada), ha StatCan (Geography Division,\n   Statistics Canada)."
       contributors_footer_1_html: "↓Evit muioc'h a vunudoù diwar-benn ar re-se, hag ar mammennoù all a zo bet implijet da sikour da wellaat OpenStreetMap, sellit ouzh ar <a\nhref=\"http://wiki.openstreetmap.org/wiki/Contributors\">Bajenn Skoazellerien</a> e Wiki OpenStreetMap."
       contributors_footer_2_html: Enlakaat roadennoù e OpenStreetMap ne empleg ket ez aprou ar bourchaserien orin a endalc'had OpenStreetMap, na ne bourchasont, na ne waratomp pe na ne zegemeront ne vern pe atebegezh e vefe.
       contributors_fr_html: "<strong>Frañs</strong> : Ennañ roadennoù eus Renerezh Hollek an Tailhoù."
-      contributors_gb_html: "<strong>Rouantelezh-Unanet</strong> : Ennañ roadennoù eus Ordnance\n   Survey data &copy; Crown copyright and database right 2010."
-      contributors_intro_html: "Hervez hon aotre-implijout CC BY-SA e tleit &ldquo;reiñ kred a-walc'h \n  d'an aozer orin diouzh ar media a implijit&rdquo;.\n  Kartennourien hiniennel OSM ne c'houlennont ket\n  kred panevet &ldquo;kenlabourerien OpenStreetMap&rdquo;,\n  met pa vez ebarzhet roadennoù eus un ajañs kartennañ broadel\n  pe ur vammenn veur all en OpenStreetMap,\n  e c'hall bezañ fur reiñ kred dezho war-eeun\n  en doare a c'houlennont pe dre ul liamm war-du ar bajenn-mañ."
+      contributors_gb_html: "<strong>Rouantelezh-Unanet</strong> : Ennañ roadennoù eus Ordnance\n   Survey data &copy; Crown copyright and database right 2010-12."
+      contributors_intro_html: "Miliadoù a hiniennoù a labour ganimp. Ebarzhiñ a reomp ivez roadennoù digor eus ajañsoù kartennañ hag eus mamennoù all, hag en o zouez :"
       contributors_nl_html: "<strong>Netherlands</strong> : Contains &copy; AND data, 2007\n  (<a href=\"http://www.and.com\">www.and.com</a>)"
       contributors_nz_html: "<strong>Zeland-Nevez</strong> : Ennañ roadennoù eus\n   Land Information New Zealand. Crown Copyright reserved."
       contributors_title_html: Hor c'henlabourerien
       contributors_za_html: "<strong>Afrika ar Su</strong> : Ennañ roadennoù eus\n<a href=\"http://www.ngi.gov.za/\">Chief Directorate:\nNational Geo-Spatial Information</a>, State copyright reserved."
-      credit_1_html: "Ma'z implijit skeudennoù OpenStreetMap, e c'houlennomp diganeoc'h\n  lakaat en ho kred ar meneg &ldquo;&copy; kenlabourerien OpenStreetMap\n  CC BY-SA&rdquo;. Ma ne implijit nemet roadennoù ar c'hartennoù,\n  e c'houlennomp diganeoc'h lakaat &ldquo;Roadennoù ar gartenn &copy; kenlabourerien OpenStreetMap,\n  CC BY-SA&rdquo;."
+      credit_1_html: Goulenn a reomp diganeoc'h lakaat en ho kred ar meneg &ldquo;&copy; kenlabourerien OpenStreetMap&rdquo;.
       credit_2_html: "Pa vez posupl e tle OpenStreetMap bezañ ur gourliamm war-du <a\n  href=\"http://www.openstreetmap.org/\">http://www.openstreetmap.org/</a>\n  ha CC BY-SA war-du <a\n  href=\"http://creativecommons.org/licenses/by-sa/2.0/\">http://creativecommons.org/licenses/by-sa/2.0/</a>.\n  Ma'z implijit ur skor ma ne c'haller ket krouiñ liammoù (da skouer :\n  un destenn moullet), ez aliomp ac'hanoc'h da gas ho lennerien da\n  www.openstreetmap.org (marteze en ur astenn\n  &lsquo;OpenStreetMap&rsquo; ar chomlec'h klok) ha da\n  www.creativecommons.org."
+      credit_3_html: "Evit ur gartenn elektronek a c'haller merdeiñ enni e tlefe ar c'hred dont war wel e korn ar gartenn.\nDa skouer :"
       credit_title_html: Penaos reiñ kred da OpenStreetMap
+      infringement_1_html: "Degas a reomp da soñj da genlabourerien OSM ne zleont morse lakaat roadennoù a zeu\neus mammennoù dindan wirioù (da sk. : Google Maps pe kartennoù moullet) hep aotre\nezpleg ar re zo ar gwirioù-aozer ganto."
+      infringement_2_html: ma kredit ez eus bet ouzhpennet danvez dindan aotre-implijout e gaou da diaz roadennoù OpenStreetMat pe d'al lec'hienn-mañ, roit an dra-se da c'houzout d'hon <a href="http://www.osmfoundation.org/wiki/License/Takedown_procedure">argerzh dizober</a>, mar plij, pe skrivit war-eeun war hor <a href="http://dmca.openstreetmap.org/">furmskrid enlinenn</a>.
+      infringement_title_html: Terriñ ar gwir-eilañ
       intro_1_html: "   OpenStreetMap zo un hollad <i>roadennoù digor</i>, a c'haller kaout dindan an aotre-implijout <a\n   href=\"http://creativecommons.org/licenses/by-sa/2.0/\">Creative\n   Commons Attribution-ShareAlike 2.0</a> (CC BY-SA)."
-      intro_2_html: "  Dieub oc'h da eilañ, da skignañ, da gas ha da azasaat hor c'hartennoù\n  hag hor roadennoù, gant ma root kred da OpenStreetMap ha d'e\n  genlabourerien. Ma kemmit pe ma implijit hor c'hartennoù pe hor roadennoù e labourioù all,\n  ne c'hallit ket skignañ ar re-se dindan un aotre-implijout all. En \n  <a href=\"http://creativecommons.org/licenses/by-sa/2.0/legalcode\">destenn reolennoù\n  klok</a> e kavot munudoù ho kwirioù hag ho teverioù."
+      intro_2_html: "Dieub oc'h da eilañ, da skignañ, da gas ha da azasaat hor c'hartennoù\n  hag hor roadennoù, gant ma root kred da OpenStreetMap ha d'e\n  genlabourerien. Ma kemmit pe ma implijit hor c'hartennoù pe hor roadennoù e labourioù all,\n  ne c'hallit ket skignañ ar re-se dindan un aotre-implijout all. En \n  <a href=\"http://opendatacommons.org/licenses/odbl/1.0/\">legal\ncode</a> e kavot munudoù ho kwirioù hag ho teverioù."
+      intro_3_html: "Emañ tammoù hor c'hartennoù hag hon teulioù dindan an aotre-implijout <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">Creative \nCommons Attribution-ShareAlike 2.0</a> license (CC-BY-SA)."
       more_1_html: "Ma fell deoc'h kaout muioc'h a ditouroù diwar-benn adimplij hor roadennoù, lennit <a\n  href=\"http://wiki.openstreetmap.org/wiki/Legal_FAQ\">FAG ar reolennoù</a>."
-      more_2_html: "  Degas a reomp da soñj da genlabourerien OSM ne zleont morse lakaat roadennoù a zeu\n  eus mammennoù dindan wirioù (da sk. : Google Maps pe kartennoù moullet) hep aotre\n  ezpleg ar re zo ar gwirioù-azer ganto."
+      more_2_html: "Daoust da OpenStreetMap bezañ un hollad roadennoù digor, n'omp ket evit pourchas\n  un API digoust evit an diorroerien diavaez.\n  Sellit ouzh hor <a href=\"http://wiki.openstreetmap.org/wiki/API_usage_policy\">reolennoù evit implijout an API</a>,\n  <a href=\"http://wiki.openstreetmap.org/wiki/Tile_usage_policy\">reolennoù evit implijout ar gartenn</a>\n  ha <a href=\"http://wiki.openstreetmap.org/wiki/Nominatim#Usage_Policy\">reolennoù evit implijout Nominatim</a>."
       more_title_html: Titouroù ouzhpenn
       title_html: Copyright hag aotre-implijout
     native: 
@@ -1155,14 +1156,15 @@ br:
       header: "%{from_user} en deus kaset deoc'h ur gemennadenn dre OpenStreetMap gant an danvez %{subject} :"
       hi: Demat %{to_user},
     signup_confirm: 
-      subject: "[OpenStreetMap] Kadarnaat ho chomlec'h postel"
+      confirm: "A-raok ober forzh petra hon eus ezhomm da wiriañ hag-eñ ez eo ganeoc'h-c'hwi ez eo bet kaset ar goulenn-mañ ; m'emañ kont evel-se, klikit war al liamm a-is da gadarnaat ho kont :"
+      created: Unan bennak (c'hwi, emichañs) a zo o paouez krouiñ ur gont war %{site_url}.
+      greeting: Demat !
+      subject: "[OpenStreetMap] Degemer mat en OpenStreetMap"
+      welcome: Fellout a ra dimp degemer ac'hanoc'h ha reiñ un nebeud titouroù ouzhpenn deoc'h evit kregiñ ganti.
     signup_confirm_html: 
       ask_questions: Gellout a rit sevel an holl goulennoù ho pefe diwar-benn OpenStreetMap war <a href="http://help.openstreetmap.org/">hol lec'hienn goulennoù-respontoù</a>.
-      click_the_link: Ma'z eo c'hwi, degemer mat deoc'h ! Klikit war al liamm amañ dindan evit kadarnaat krouidigezh ho kont ha gouzout hiroc'h diwar-benn OpenStreetMap
       current_user: Ur roll eus an implijerien red dre rummadoù, diazezet war al lec'h m'emaint er bed, a c'haller kaout diwar <a href="http://wiki.openstreetmap.org/wiki/Category:Users_by_geographical_region">Category:Users_by_geographical_region</a>.
       get_reading: Muioc'h a ditouroù diwar-benn OpenStreetMap <a href="http://wiki.openstreetmap.org/wiki/FR:Beginners_Guide">war ar wiki</a> pe <a href="http://www.opengeodata.org/">war ar blog opengeodata</a> a ginnig ivez  <a href="http://www.opengeodata.org/?cat=13">podskignadennoù da selaou</a> !
-      greeting: Demat !
-      hopefully_you: Unan bennak (c'hwi, moarvat) a garfe krouiñ ur gont war
       introductory_video: Gallout a rit sellet ouzh un %{introductory_video_link}.
       more_videos: Bez' ez eus %{more_videos_link}.
       more_videos_here: muioc'h a videoioù amañ
@@ -1172,18 +1174,12 @@ br:
     signup_confirm_plain: 
       ask_questions: "Gellout a rit sevel an holl goulennoù ho pefe diwar-benn OpenStreetMap war hol lec'hienn goulennoù-respontoù :"
       blog_and_twitter: "Tapout ar c'heleier diwezhañ diwar blog OpenStreetMap pe Twitter :"
-      click_the_link_1: Ma'z eo c'hwi, degemer mat deoc'h ! Klikit war al liamm amañ dindan evit kadarnaat ho
-      click_the_link_2: kont ha lenn muioc'h a ditouroù diwar-benn OpenStreetMap.
-      current_user_1: Ur roll eus an implijerien diazezet war al lec'h m'emaint er bed
-      current_user_2: "a c'haller kaout diwar :"
-      greeting: Demat !
-      hopefully_you: Unan bennak (c'hwi moarvat) a garfe krouiñ ur gont war
+      current_user: "Ur roll eus an implijerien e rummadoù, diazezet war al lec'h m'emaint er bed, a c'haller kaout diwar :"
       introductory_video: "Gallout a rit sellet ouzh ur video evit kregiñ gant OpenStreetMap amañ :"
       more_videos: "Muioc'h a videoioù zo amañ :"
       opengeodata: "OpenGeoData.org eo blog OpenStreetMap, ha kinnig a ra podskignadennoù ivez :"
       the_wiki: "Lennit traoù diwar-benn OpenStreetMap war ar wiki :"
-      user_wiki_1: Erbediñ a reomp deoc'h krouiñ ur bajenn implijer wiki, enni
-      user_wiki_2: rummadoù hag a verk pelec'h emaoc'h, evel [[Category:Users_in_Brest]].
+      user_wiki_page: Erbediñ a reomp deoc'h krouiñ ur bajenn implijer war ar wiki, enni balizennoù rummadoù o tiskouez pelec'h emaoc'h, evel [[Category:Users_in_London]].
       wiki_signup: "Gallout a rit ivez krouiñ ur gont war wiki OpenStreetMap war :"
   oauth: 
     oauthorize: 
@@ -1299,6 +1295,8 @@ br:
     index: 
       js_1: Pe emaoc'h oc'h implijout ur merdeer ha ne skor ket JavaScript, pe hoc'h eus diweredekaet JavaScript.
       js_2: OpenStreetMap a implij JavaScript evit e gartenn risklus.
+      license: 
+        copyright: Gwir-eilañ gant OpenStreetMap hag ar genlabourerien, dindan un aotre-implijout digor
       permalink: Peurliamm
       remote_failed: C'hwitet eo ar c'hemm - gwiriit hag-eñ eo karget JOSM or Merkaartor ha gweredekaet an dibarzh kontroll a-bell
       shortlink: Liamm berr
@@ -1510,6 +1508,10 @@ br:
       email never displayed publicly: (n'eo ket diskwelet d'an holl morse)
       flash update success: Hizivaet eo bet titouroù an implijer.
       flash update success confirm needed: Hizivaet eo bet titouroù an implijer. Gwiriit ho posteloù evit kadarnaat ho chomlec'h postel nevez.
+      gravatar: 
+        gravatar: Implijout Gravatar
+        link: http://wiki.openstreetmap.org/wiki/Gravatar
+        link text: petra eo se ?
       home location: "Lec'hiadur ar gêr :"
       image: "Skeudenn :"
       image size hint: (ar skeudennoù karrezenneg gant ar stumm 100×100 pixel a zo ar re wellañ)
@@ -1645,6 +1647,7 @@ br:
       email address: "Chomlec'h postel :"
       fill_form: Leugnit ar furmskrid hag e kasimp deoc'h ur postel evit gweredekaat ho kont.
       flash create success message: Trugarez deoc'h evit en em enskrivañ ! Kaset hon eus ur postel kadarnaat da %{email}. Kerkent ha kadarnaet ho kont e c'hallot kregiñ da gartennañ.<br /><br />Ma implijit ur reizhiad enep-strob hag a gas goulennoù kadarnaat, lakait webmaster@openstreetmap.org en ho listenn wenn, mar plij, rak n'omp ket evit respont d'ar posteloù-se.
+      flash welcome: Trugarez da vezañ lakaet hoc'h anv. Kas a raimp ur c'hemennad degemer mat dre %{email} gant un nebeud korvigelloù evit loc'hañ.
       heading: Krouiñ ur gont implijer
       license_agreement: Pa gadarnaot ho kont e tleot asantiñ da <a href="http://www.osmfoundation.org/wiki/License/Contributor_Terms">ziferadennoù ar c'henlabourer</a>.
       no_auto_account_create: Siwazh n'omp ket evit krouiñ ur gont evidoc'h ent emgefreek.

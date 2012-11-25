@@ -1,4 +1,4 @@
-# Messages for Serbian (Latin script) (‪srpski (latinica)‬)
+# Messages for Serbian (Latin script) (srpski (latinica)‎)
 # Exported from translatewiki.net
 # Export driver: syck-pecl
 # Author: McDutchie
@@ -437,14 +437,11 @@ sr-Latn:
     description: 
       title: 
         geonames: Lokacija iz <a href="http://www.geonames.org/">Geografskih imena</a>
-        osm_namefinder: "%{types} iz <a href=\"http://gazetteer.openstreetmap.org/namefinder/\">Tragača naziva</a>"
         osm_nominatim: Lokacija iz <a href="http://nominatim.openstreetmap.org/">Nominatima</a>
       types: 
         cities: Gradovi
         places: Mesta
         towns: Varošice
-    description_osm_namefinder: 
-      prefix: "%{distance} %{direction} od %{type}"
     direction: 
       east: istočno
       north: severno
@@ -466,14 +463,9 @@ sr-Latn:
         ca_postcode: Rezultati iz <a href="http://geocoder.ca/">Geokodera</a>
         geonames: Rezultati iz <a href="http://www.geonames.org/">Geografskih imena</a>
         latlon: Rezultati iz <a href="http://openstreetmap.org/">Internala</a>
-        osm_namefinder: Rezultati iz <a href="http://gazetteer.openstreetmap.org/namefinder/">Tragača naziva</a>
         osm_nominatim: Rezultati iz <a href="http://nominatim.openstreetmap.org/">Nominatima</a>
         uk_postcode: Rezultati iz <a href="http://www.npemap.org.uk/">NPEMap-a</a>
         us_postcode: Rezultati iz <a href="http://geocoder.us/">Geokodera</a>
-    search_osm_namefinder: 
-      suffix_parent: "%{suffix} (%{parentdistance} %{parentdirection} od %{parentname})"
-      suffix_place: ", %{distance} %{direction} od %{placename}"
-      suffix_suburb: "%{suffix}, %{parentname}"
     search_osm_nominatim: 
       prefix: 
         aeroway: 
@@ -1180,11 +1172,8 @@ sr-Latn:
       subject: "[OpenStreetMap] Potvrdite vašu e-adresu"
     signup_confirm_html: 
       ask_questions: Možete postaviti bilo koje pitanje o Openstritmapu na našim <a href="http://help.openstreetmap.org/">stranicama za pitanja i odgovore</a>.
-      click_the_link: Ako ste to vi, dobro došli! Kliknite na vezu ispod da biste potvrdili vaš nalog i pročitali više o Openstritmapu
       current_user: Spisak trenutnih korisnika u kategorijama, zasnovan na tome gde se oni nalaze, dostupan je na <a href="http://wiki.openstreetmap.org/wiki/Category:Users_by_geographical_region">Category:Users_by_geographical_region</a>.
       get_reading: Pročitajte više o Openstritmapu <a href="http://wiki.openstreetmap.org/wiki/Beginners%27_Guide">na vikiju</a>, budite u toku s najnovijim vestima preko <a href="http://blog.openstreetmap.org/">bloga</a> ili <a href="http://twitter.com/openstreetmap">Tvitera</a> ili pretražite <a href="http://www.opengeodata.org/">OpenGeoData</a>, blog osnivača Openstritmapa za istoriju projekata. Možete da slušate i <a href="http://www.opengeodata.org/?cat=13">podemisije</a>!
-      greeting: Pozdrav!
-      hopefully_you: Neko (verovatno vi) želeo bi da otvori nalog na
       introductory_video: Možete pogledati %{introductory_video_link}.
       more_videos: Postoji %{more_videos_link}.
       more_videos_here: više video-snimaka ovde
@@ -1194,19 +1183,11 @@ sr-Latn:
     signup_confirm_plain: 
       ask_questions: "Možete postaviti bilo koje pitanje o Openstritmapu na našim stranicama za pitanja i odgovore:"
       blog_and_twitter: "Budite u toku s najnovijim vestima preko bloga ili Tvitera:"
-      click_the_link_1: Ako ste to vi, dobro došli! Kliknite na vezu ispod da biste potvrdili svoj
-      click_the_link_2: korisnički nalog. Pročitajte više o Openstritmapu.
-      current_user_1: Spisak trenutnih korisnika u kategorijama, na osnovu položaja u svetu
-      current_user_2: "gde žive, dostupan je na:"
-      greeting: Pozdrav!
-      hopefully_you: Neko (verovatno vi) želeo bi da otvori nalog na
       introductory_video: "Pogledajte uvodni video-snimak za Openstritmap ovde:"
       more_videos: "Više video-snimaka možete naći ovde:"
       opengeodata: "OpenGeoData.org je blog Stiva Kosta, osnivača Openstritmapa:"
       the_wiki: "Pročitajte više o Openstritmapu na vikiju:"
       the_wiki_url: http://wiki.openstreetmap.org/wiki/Sr:Beginners'_guide?uselang=sr-ec
-      user_wiki_1: Preporučujemo vam da napravite korisničku stranicu koja uključuje
-      user_wiki_2: oznake kategorija koje označavaju odakle ste, kao na primer [[Category:Users_in_London]].
       wiki_signup: "Možete i otvoriti nalog na našem vikiju:"
       wiki_signup_url: http://wiki.openstreetmap.org/index.php?title=Special:UserLogin&type=signup&returnto=MK%3AMain_Page&uselang=sr-ec
   oauth: 

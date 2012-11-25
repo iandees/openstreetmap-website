@@ -401,7 +401,7 @@ he:
       area_to_export: האזור לייצוא
       embeddable_html: HTML שניתן להטמעה
       export_button: ייצוא
-      export_details: המידע ב־OpenStreetMap מוגש בכפוף לרישיון <a href="http://creativecommons.org/licenses/by-sa/2.0/deed.he/">CC ייחוס־שיתוף זהה 2.0</a>.
+      export_details: המידע ב־OpenStreetMap מוגש בכפוף ל<a href="href="http://opendatacommons.org/licenses/odbl/1.0/">רישיון Open Data Commons לנתונים פתוחים</a> (ODbL).
       format: פורמט
       format_to_export: תבנית לייצוא
       image_size: גודל התמונה
@@ -432,14 +432,11 @@ he:
     description: 
       title: 
         geonames: מיקום מאתר <a href="http://www.geonames.org/">GeoNames</a>
-        osm_namefinder: "%{types} מ־<a href=\"http://gazetteer.openstreetmap.org/namefinder/\">OpenStreetMap Namefinder</a>"
         osm_nominatim: מיקום מאתר <a href="http://nominatim.openstreetmap.org/">OpenStreetMap Nominatim</a>
       types: 
         cities: ערים
         places: מקומות
         towns: עיירות
-    description_osm_namefinder: 
-      prefix: "%{distance} מ%{direction} ל־%{type}"
     direction: 
       east: מזרח
       north: צפון
@@ -461,13 +458,9 @@ he:
         ca_postcode: תוצאות מאתר <a href="http://geocoder.ca/">Geocoder.CA</a>
         geonames: תוצאות מאתר <a href="http://www.geonames.org/">GeoNames</a>
         latlon: תוצאות מ<a href="http://openstreetmap.org/">אתר זה</a>
-        osm_namefinder: תוצאות מאתר <a href="http://gazetteer.openstreetmap.org/namefinder/">OpenStreetMap Namefinder</a>
         osm_nominatim: תוצאות מאתר <a href="http://nominatim.openstreetmap.org/">OpenStreetMap Nominatim</a>
         uk_postcode: תוצאות מאתר <a href="http://www.npemap.org.uk/">NPEMap / FreeThe Postcode</a>
         us_postcode: תוצאות מאתר <a href="http://geocoder.us/">Geocoder.us</a>
-    search_osm_namefinder: 
-      suffix_parent: "%{suffix} (%{parentdistance} %{parentdirection} ל־%{parentname})"
-      suffix_place: ", %{distance} מ%{direction} ל־%{placename}"
     search_osm_nominatim: 
       prefix: 
         aeroway: 
@@ -1014,24 +1007,32 @@ he:
       text: במקרה של חוסר תאימות בין עמוד מתורגם זה ובין %{english_original_link}, יש לתת עדיפות לעמוד באנגלית
       title: אודות תרגום זה
     legal_babble: 
+      attribution_example: 
+        alt: דוגמה לצורה הנכונה לתת ייחוס ל־OpenStreetMap באתר האינטרנט
+        title: דוגמה לייחוס
       contributors_at_html: "<strong>אוסטריה</strong>: מכיל נתונים\nמ<a href=\"http://data.wien.gv.at/\">עיריית וינה</a> לפי תנאי\n<a href=\"http://creativecommons.org/licenses/by/3.0/at/deed.de\">CC BY</a>,\nמ<a href=\"http://www.vorarlberg.at/vorarlberg/bauen_wohnen/bauen/vermessung_geoinformation/weitereinformationen/services/wmsdienste.htm\">מדינת פורארלברג</a>\nוממדינת טירול (לפי <a href=\"http://www.tirol.gv.at/applikationen/e-government/data/nutzungsbedingungen/\">CC-BY AT עם תיקונים</a>)."
       contributors_ca_html: "<strong>קנדה</strong>: מכיל נתונים\nמ־GeoBase&reg;&rlm;, GeoGratis&rlm; (&copy;&rlm; Department of Natural\nResources Canada)&rlm;, CanVec&rlm; (&copy;&rlm; Department of Natural\nResources Canada), ו־StatCan&rlm; (Geography Division,\nStatistics Canada)."
       contributors_footer_1_html: "למידע נוסף על מקורות אלה ואחרים ששימשו\nלשיפור OpenStreetMap, נא לראות את <a\nhref=\"http://wiki.openstreetmap.org/wiki/Contributors\">דף\nהתורמים</a> בוויקי של OpenStreetMap."
       contributors_footer_2_html: "הכללה של נתונים ב־OpenStreetMap אינה אומרת שהספק המקורי\nשל הנתוהים תומך ב־OpenStreetMap, לוקח על עצמו אחריות כלשהי, או\nמקבל חבות כלשהי."
       contributors_fr_html: "<strong>צרפת</strong>: מכיל נתונים שהגיעו במקור\nממנהלת המסים הכללית (Direction Générale des Impôts)."
-      contributors_gb_html: "<strong>הממלכה המאוחדת</strong>: מכיל נתוני סקר מדידות\n&copy; זכויות הכתר וזכויות מסדי נתונים\n2010."
-      contributors_intro_html: "מדיניות CC BY-SA שלנו דורשת מכם „לייחס את היצירה (לתת קרדיט) ליוצר\nבאופן הסביר באמצעי התקשורת שאתם\nמשתמשים בו”. ממפים פרטניים של OSM אינם מבקשים ייחוס ייחודי מעבר\nל„תורמי OpenStreetMap”, אבל כאשר נתונים מסוכנות מיפוי\nלאומית או ממקור גדול אחר נכללים ב־OpenStreetMap,\nיכול להיות סביר לתת להם ייחוס ישיר באמצעות העתקת המידע עליהם\nאו באמצעות קישור לדף הזה."
+      contributors_gb_html: "<strong>הממלכה המאוחדת</strong>: מכיל נתוני סקר מדידות\n&copy; זכויות הכתר וזכויות מסדי נתונים\n2010–2012."
+      contributors_intro_html: "התורמים שלנו הם אלפי אנשים. אנו גם כוללים\nנתונים ברישיון פתוח מסוכנויות מיפוי לאומות\nוממקורות אחרים, בהם:"
       contributors_nl_html: "<strong>הולנד</strong>: מכיל &copy; נתונים מ־ AND&rlm;, 2007\n(<a href=\"http://www.and.com\">www.and.com</a>)"
       contributors_nz_html: "<strong>ניו זילנד</strong>: מכיל נתונים שהגיעו במקור\nמ־Land Information New Zealand. זכויות היוצרים של הכתר שמורות."
       contributors_title_html: התורמים שלנו
       contributors_za_html: "<strong>דרום אפריקה</strong>: מכיל נתונים שהגיעו\nמ־<a href=\"http://www.ngi.gov.za/\">מִנהל כללי:\nמידע גאו־מרחבי לאומי</a>, זכות יוצרים ממלכתית שמורה."
-      credit_1_html: "אם אתם משתמשים בתמונות של מפות מ־OpenStreetMap, אנו מבקשים\nשבנתונים על היוצר יהיה כתוב לכל הפחות „© תורמי OpenStreetMap,\nרישיון CC BY-SA”. אם אתם משתמשים רק בנתוני מפות,\nאנו מבקשים „נתוני מפות © תורמי OpenStreetMap,\nרישיון CC BY-SA”."
-      credit_2_html: "כשזה אפשרי, המילה OpenStreetMap צריכה להיות מקושרת אל הכתובת\n<a href=\"http://www.openstreetmap.org/\">http://www.openstreetmap.org/</a>\nו־CC BY-SA אל <a\nhref=\"http://creativecommons.org/licenses/by-sa/2.0/\">http://creativecommons.org/licenses/by-sa/2.0/</a>. אם\nאתם משתמשים באמצעי תקשורת שבו אין אפשרות להשתמש בקישורים (למשל\nבדפוס), אנו ממליצים שתַפנו את קוראיכם לאתר\nwww.openstreetmap.org (אולי על־ידי\nכתיבת הכתובת המלאה הזאת במקום „OpenStreetMap”) ואל\nwww.creativecommons.org."
+      credit_1_html: אנו דורשים ייחוס אל „&copy; תורמי OpenStreetMap”.
+      credit_2_html: "כמו־כן, חובתך להבהיר שהנתונים זמינים בכפוף לרישיון למסדי\nנתונים פתוחים, ואם נעשה שימוש באריחי המפה שלנו, שהמיפוי כפופות\nלרישיון CC-BY-SA. באפשרותך לעשות זאת באמצעות קישור אל\n<a href=\"http://www.openstreetmap.org/copyright\">דף זכויות היוצירם</a>.\nלחלופין, וזו חובתך בעת הפצת OSM בצורת\nנתונים, באפשרותך לציין את השמות ולקשר ישירות אל הרישיון או הרישיונות. באמצעי תקשורת\nשלא ניתן להשתמש בהם בקישורים (למשל בדפוס), אני ממליצים\nלהפנות את הקוראים שלך אל openstreetmap.org (אולי על־ידי הרחבת\n„OpenStreetMap” ככתובת מלאה), אל opendatacommons.org, ואם\nזה מתאים, אל creativecommons.org."
+      credit_3_html: "בשביל מפה אלקטרונית שאפשר לעיין בה, הייחוס צריך להופיע בפינת המפה. למשל:"
       credit_title_html: איך לתת ייחוס ל־OpenStreetMap
+      infringement_1_html: "אנו מזכירים לתורמים ל־OSM לעולם לא להוסיף נתונים משום מקור\nשמוגבל בזכויות יוצרים (למשל מפות גוגל או מפות מודפסות) ללא\nאישור מפורש מבעלי הזכויות."
+      infringement_2_html: "אם נראה לך שחומר שמוגבל בזכויות יוצרים נוסף באופן לא הולם\nאל מסד הנתונים של OpenStreetMap או אל האתר הזה, נא לפנות\nאל <a href=\"http://www.osmfoundation.org/wiki/License/Takedown_procedure\">נוהל\nההסרה</a> שלנו או כתבו תלונה ישירות\n<a href=\"http://dmca.openstreetmap.org/\">בדף התלונות המקוון שלנו</a>."
+      infringement_title_html: הפרת זכויות יוצרים
       intro_1_html: "אתר OpenStreetMap הוא <i>נותנים פתוחים</i>, המופצים לפי רישיון <a\nhref=\"http://creativecommons.org/licenses/by-sa/2.0/\">קריאייטיב\nקומונז ייחוס–שיתוף־זהה 2.0</a> (CC BY-SA)."
-      intro_2_html: "אתם חופשיים להעתיק, להפיץ, לשדר ולהתאים את המפות שלנו\nואת הנתונים שלנו, כל עוד אתם נותנים ייחוס ל־OpenStreetMap\nולתורמים למיזם. אם אתם משנים את הנתונים או את המפות שלנו או מסתמכים עליהם כדי ליצור משהו חדש,\nמותר לכם להפיץ את התוצאות רק לפי תנאי אותו הרישיון.\n<a href=\"http://creativecommons.org/licenses/by-sa/2.0/legalcode\">המסמך\nהמשפטי</a> המלא מסביר את זכויותיכם ואת תחומי האחריות שלכם."
-      more_1_html: "קִראו עוד על שימוש בנתונים שלנו ב<a\nhref=\"http://wiki.openstreetmap.org/wiki/Legal_FAQ\">דף שו״ת\nמשפטי</a>."
-      more_2_html: "אנו מזכירים לתורמי OSM לעולם לא להוסיף נתונים משום מקור\nשמוגבל בזכויות יוצרים (למשל מפות גוגל או מפות מודפסות) ללא\nאישור מפורש מבעלי הזכויות."
+      intro_2_html: "אתם חופשיים להעתיק, להפיץ, לשדר ולהתאים את הנתונים שלנו,\nכל עוד אתם נותנים ייחוס ל־OpenStreetMap\nולתורמים למיזם. אם אתם משנים את הנתונים או את המפות שלנו או מסתמכים עליהם כדי ליצור משהו חדש,\nמותר לכם להפיץ את התוצאות רק לפי תנאי אותו הרישיון.\n<a href=\"http://opendatacommons.org/licenses/odbl/1.0/\">המסמך\nהמשפטי</a> המלא מסביר את זכויותיכם ואת תחומי האחריות שלכם."
+      intro_3_html: "המיפוי באריחי המפה שלנו, והתיעוד שלנו מוגשים בכפוף\nלרישיון <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">קריאייטיב\nקומונז ייחוס–שיתוף־זהה 2.0</a> license (בקיצור CC-BY-SA)."
+      more_1_html: "קִראו עוד על שימוש בנתונים שלנו ועל דרכים לייחס אלינו יצירות נגזרות ב<a\nhref=\"http://wiki.openstreetmap.org/wiki/Legal_FAQ\">דף שו״ת\nמשפטי</a>."
+      more_2_html: "אף־על־פי ש־OpenStreetMap הוא מיזם נתונים פתוחים, איננו יכולים לספק\nAPI מפות בחינם למפתחי צד שלישי.\nר׳ את דפי המדיניות שלנו: <a href=\"http://wiki.openstreetmap.org/wiki/API_usage_policy\">המדיניות השימוש ב־API</a>,\n<a href=\"http://wiki.openstreetmap.org/wiki/Tile_usage_policy\">מדיניות השימוש באריחים</a>\nו<a href=\"http://wiki.openstreetmap.org/wiki/Nominatim#Usage_Policy\">מדיניות השימוש בנומינטים</a>."
       more_title_html: איך למצוא מידע נוסף
       title_html: זכויות יוצרים ורישיון
     native: 
@@ -1162,14 +1163,15 @@ he:
       header: "לתיבתך ב־OpenStreetMap הגיעה הודעה מאת %{from_user} עם הנושא %{subject}:"
       hi: שלום %{to_user},
     signup_confirm: 
-      subject: "[אופן סטריט מאפ OpenStreetMap] נא לאשר כתובת דוא״ל"
+      confirm: "לפני שאנחנו ממשיכים, אנחנו צריכים לוודא שהבקשה הגיעה ממך, אז אם באמת עשית את זה, צריך ללחוץ כאן כדי לאמת את החשבון שלך:"
+      created: מישהו (בתקווה את או אתה) יצר חשבון באתר %{site_url}.
+      greeting: אהלן!
+      subject: "[אופן סטריט מאפ OpenStreetMap] ברוך בואך לאופן סטריט מאפ"
+      welcome: אנחנו רוצים לברך אותך ולתת לך קצת מידע נוסף כדי שיהיה לך קל יותר להתחיל.
     signup_confirm_html: 
       ask_questions: באפשרותך לשאול שאלות על אתר OpenStreetMap ב<a href="http://help.openstreetmap.org/">אתר השאלות ותשובות שלנו</a>.
-      click_the_link: אם אכן מדובר בך, ברוך בואך! נא ללחוץ על הקישור מטה כדי לאמת את החשבון ולקרוא מידע נוסף על OpenStreetMap
       current_user: רשימת משתמשים נוכחיים בקטגוריות, בהתאום למיקומם בעולם, זמינה בדף <a href="http://wiki.openstreetmap.org/wiki/Category:Users_by_geographical_region">Category:Users_by_geographical_region</a>.
       get_reading: "לקריאה נוספת על OpenStreetMap <a href=\"http://wiki.openstreetmap.org/wiki/Beginners%27_Guide\">באתר הוויקי</a>, להתעדכן בחדשות האחרונות ב<a href=\"http://blog.openstreetmap.org/\">בלוג OpenStreetMap</a> או ב<a href=\"http://twitter.com/openstreetmap\">טוויטר</a>, או לקריאה בבלוג של מייסד OpenStreetMap סטיב קוסט: <a href=\"http://www.opengeodata.org/\">OpenGeoData blog</a> למידע על ההיסטוריה של המיזם, ויש בו גם <a href=\"http://www.opengeodata.org/?cat=13\">קובצי קול<a/>!"
-      greeting: שלום!
-      hopefully_you: מישהו (בתקווה שמדובר בך) ביקש ליצור חשבון משתמש ב
       introductory_video: ניתן לצפות בסרטו מבוא ב-%{introductory_video_link}.
       more_videos: צפייה בסרטונים נוספים בכתובת %{more_videos_link}.
       more_videos_here: סרטונים נוספים מצויים כאן
@@ -1179,18 +1181,12 @@ he:
     signup_confirm_plain: 
       ask_questions: "באפשרותך לשאול שאלות על OpenStreetMap בדף השאלות ותשובות שלנו:"
       blog_and_twitter: "ניתן להתעדכן בחדשות האחרונות דרך הבלוג או חשבון הטוויטר של OpenStreetMap:"
-      click_the_link_1: אם אכן מדובר בך, ברוך בואך! נא ללחוץ על הקישור מטה כדי לאמת את
-      click_the_link_2: החשבון ולקרוא מידע נוסף על אתר OpenStreetMap.
-      current_user_1: רשימת קטגוריות משתמשים, המבוססת על מיקומכם ברחבי העולם
-      current_user_2: "מצויה כאן:"
-      greeting: שלום!
-      hopefully_you: מישהו (בתקווה שמדובר בך) מבקש ליצור חשבון ב
+      current_user: "רשימה של משתמשים לפי קטגוריות, בהתאם למקום המגורים שלהם, זמין כאן:"
       introductory_video: "באפשרותך לצפות בסרטון הדרכה לאתר OpenStreetMap כאן:"
       more_videos: "סרטוני הדרכה נוספים מצויים כאן:"
       opengeodata: "אתר OpenGeoData.org הוא הבלוג של מייסד OpenStreetMap סטיב קוסט, ויש בו גם פודקאסטים (הקלטות קול):"
       the_wiki: "ניתן לקרוא על OpenStreetMap בדפי ויקי:"
-      user_wiki_1: אנו ממליצים ליצור דף משתמש, שיכלול
-      user_wiki_2: "קטגוריות המסמנות את מקומכם, כגון קטגוריית „משתמשים בלונדון”: [[Category:Users_in_London]]."
+      user_wiki_page: מומלץ ליצור דף משתמש בוויקי עם תגים שאומרים מה מיקומך, למשל [[Category:Users_in_London]].
       wiki_signup: "באפשרותך להירשם לוויקי OpenStreetMap בכתובת:"
   oauth: 
     oauthorize: 
@@ -1306,6 +1302,8 @@ he:
     index: 
       js_1: הדפדפן שבו אתה משתמש אינו תומך ב־JavaScript, או שהשבתת את השימוש ב־JavaScript.
       js_2: אתר OpenStreetMap משתמש ב־JavaScript למפה המחליקה.
+      license: 
+        copyright: "זכויות היוצרים: מיזם OpenStreetMap ותורמיו, בכפוף לרישיון פתוח"
       permalink: קישור קבוע
       remote_failed: העריכה נכשלה – נא לוודא כי JOSM או Merkaartor נטענו ושאפשרות השליטה מקחור מופעלת
       shortlink: קישור מקוצר
@@ -1517,6 +1515,10 @@ he:
       email never displayed publicly: (לעולם לא מוצגת בפומבי)
       flash update success: פרטי המשתמש/ת עודכנו בהצלחה.
       flash update success confirm needed: מידע המשתמש/ת עודכן בהצלחה. נא בדקו את תיבת הדוא"ל על מנת לאשרר את הדוא"ל החדש.
+      gravatar: 
+        gravatar: להשתמש ב־Gravatar
+        link: http://wiki.openstreetmap.org/wiki/Gravatar
+        link text: מה זה?
       home location: "מיקום ראשי:"
       image: "תמונה:"
       image size hint: (תמונה מרובעת בגודל 100x100 לפחות עובדת הכי טוב)
@@ -1592,7 +1594,7 @@ he:
       heading: כניסה
       login_button: כניסה
       lost password link: איבדת את הססמה שלך?
-      new to osm: חדש ב־OpenStreetMap?
+      new to osm: הגעת עכשיו ב־OpenStreetMap?
       no account: אין לך חשבון?
       openid: "%{logo} OpenID:"
       openid invalid: סליחה, ה־OpenID שלך נראה מקולקל
@@ -1619,7 +1621,7 @@ he:
           title: כניסה עם חשבון יאהו
       password: "ססמה:"
       register now: להירשם עכשיו
-      remember: "לזכור אותי:"
+      remember: לזכור אותי
       title: כניסה
       to make changes: כדי לשנות את נתוני OpenStreetMap, צריך שיהיה לך חשבון.
       with openid: "לחלופין אפשר להשתמש ב־OpenID כדי להיכנס:"
@@ -1652,6 +1654,7 @@ he:
       email address: "כתובת דוא״ל:"
       fill_form: נא למלא את הטופס הבא ונשלח לך מכתב מהיר כדי להפעיל את חשבונך.
       flash create success message: תודה על הרישום. שלחנו מכתב אישור לכתוב %{email} וכשנקבל ממך את האישור, אפשר יהיה להתחיל למפות.<br /><br />אם נעשה בחשבון הדוא״ל שלך שימוש במערכת שמלבינה הודעות, נא להוסיף את webmaster@openstreetmap.org לרשימה הלבנה, כי איננו יכולים להשיב לבקשות אישור.
+      flash welcome: תודה על הרישום. שלחנו לך הודעת „ברוך בואך” לכתובת %{email} עם כמה עצות שיעזרו לך להתחיל.
       heading: יצירת חשבון משתמש
       license_agreement: עם אישור החשבון יש לקבל את <a href="http://www.osmfoundation.org/wiki/License/Contributor_Terms">תנאי התרומה</a>.
       no_auto_account_create: למרבה הצער, כעת איננו יכולים ליצור לך חשבון באופן אוטומטי.

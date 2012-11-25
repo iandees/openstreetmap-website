@@ -2,6 +2,7 @@
 # Exported from translatewiki.net
 # Export driver: syck-pecl
 # Author: AnakngAraw
+# Author: Ianlopez1115
 tl: 
   activerecord: 
     attributes: 
@@ -401,7 +402,7 @@ tl:
       area_to_export: Pook na Iluluwas
       embeddable_html: Maibabaong HTML
       export_button: Iluwas
-      export_details: Ang dato ng OpenStreetMap ay may lisensiyang nasa ilalim ng <a href="http://creativecommons.org/licenses/by-sa/2.0/">lisensiyang Creative Commons Attribution-ShareAlike 2.0</a>.
+      export_details: Ang dato ng OpenStreetMap ay may lisensiyang nasa ilalim ng <a href="http://opendatacommons.org/licenses/odbl/1.0">lisensiyang Open Data Commons Open Database License (ODbL)</a>.
       format: Anyo
       format_to_export: Anyong Iluluwas
       image_size: Sukat ng Larawan
@@ -432,14 +433,11 @@ tl:
     description: 
       title: 
         geonames: Kinalalagyan mula sa <a href="http://www.geonames.org/">GeoNames</a>
-        osm_namefinder: "%{types} mula sa <a href=\"http://gazetteer.openstreetmap.org/namefinder/\">Tagapaghanap ng Pangalan ng OpenStreetMap</a>"
         osm_nominatim: Kinalalagyan mula sa <a href="http://nominatim.openstreetmap.org/">Nominatim ng OpenStreetMap</a>
       types: 
         cities: Mga lungsod
         places: Mga lugar
         towns: Mga bayan
-    description_osm_namefinder: 
-      prefix: "%{distance} %{direction} ng %{type}"
     direction: 
       east: silangan
       north: hilaga
@@ -461,14 +459,9 @@ tl:
         ca_postcode: Mga kinalabasan mula sa <a href="http://geocoder.ca/">Geocoder.CA</a>
         geonames: Mga kinalabasan mula sa <a href="http://www.geonames.org/">GeoNames</a>
         latlon: Mga kinalabasan mula sa <a href="http://openstreetmap.org/">Panloob</a>
-        osm_namefinder: Mga kinalabasan mula sa <a href="http://gazetteer.openstreetmap.org/namefinder/">Tagahanap ng Pangalan ng OpenStreetMap</a>
         osm_nominatim: Mga kinalabasan mula sa <a href="http://nominatim.openstreetmap.org/">Nominatim ng OpenStreetMap</a>
         uk_postcode: Mga kinalabasan mula sa  <a href="http://www.npemap.org.uk/">NPEMap / FreeThe Postcode</a>
         us_postcode: Mga kinalabasan mula sa <a href="http://geocoder.us/">Geocoder.us</a>
-    search_osm_namefinder: 
-      suffix_parent: "%{suffix} (%{parentdistance} %{parentdirection} ng %{parentname})"
-      suffix_place: ", %{distance} %{direction} ng %{placename}"
-      suffix_suburb: "%{suffix}, %{parentname}"
     search_osm_nominatim: 
       prefix: 
         aeroway: 
@@ -1035,11 +1028,12 @@ tl:
       contributors_nz_html: "<strong>Bagong Selanda</strong>: naglalaman ng dato na nanggaling magmula sa\nKabatirang Panlupain ng Bagong Selanda. Nakareserba ang Karapatan sa Paglalatahala\nna Pangkorona."
       contributors_title_html: Mga tagapag-ambag namin
       contributors_za_html: "<strong>Timog Aprika</strong>: Naglalaman ng datong nanggaling magmula sa \n<a href=\"http://www.ngi.gov.za/\">Punong Pangasiwaan: \nPambansang Kabatiran na Pangheograpiya at Pangkalawakan</a>, nakareserba ang \nkarapatan ng paglalathala ng Estado."
-      credit_1_html: "Kapag gumagamit ka ng mga imahe ng mapa ng OpenStreetMap, hinihiling namin na\nsa pagbanggit mo ay mababasa ang kahit na &ldquo;&copy; mga tagapag-ambag ng \nOpenStreetMap, CC BY-SA&rdquo;. Kapag ang ginagamit mo ay ang dato ng mapa lamang,\nhinihiling namin ang &ldquo;Dato ng mapa &copy; mga tagapag-ambag ng OpenStreetMap,\nCC BY-SA&rdquo;."
+      credit_1_html: "Kinakailangan namin na gamitin ang kredito na &ldquo;&copy; mga tagapag-ambag ng \nOpenStreetMap&rdquo;."
       credit_2_html: "Kung saan maaari, dapat na ikawing nang labis (lagyan ng hyperlink) ang OpenStreetMap\nna papunta sa <a\nhref=\"http://www.openstreetmap.org/\">http://www.openstreetmap.org/</a>\nat CC BY-SA sa <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">http://creativecommons.org/licenses/by-sa/2.0/</a>. Kung\ngumagamit ka ng isang midyum o kasangkapan kung saan hindi maaari ang mga kawing (iyong isang\nakdang nakalimbag), iminumungkahi namin na ituro ang mga mambabasa mo sa \nwww.openstreetmap.org (marahil sa pamamagitan ng pagpapalawak ng &lsquo;OpenStreetMap&rsquo;\nupang maging tumuturo sa buong tirahan na ito) at sa www.creativecommons.org."
       credit_title_html: Paano babanggitin ang OpenStreetMap
       intro_1_html: "Ang OpenStreetMap ay <i>bukas na dato</i>, na nilisensiyahan sa ilalim ng <a\nhref=\"http://creativecommons.org/licenses/by-sa/2.0/\">Creative\nCommons Attribution-ShareAlike 2.0</a> (CC BY-SA)."
-      intro_2_html: "Malaya mong makokopya, maipapamahagi, maipahahatid at mahahalaw ang aming mga mapa\nat dato, basta't babanggitin mo ang OpenStreetMap at ang mga tagapag-ambag\nnito. Kapag binago mo o nagbuo sa pamamagitan ng aming mga mapa o dato, maaari\nmong ipamahagi ang resulta sa ilalim lamang ng katulad na lisensiya. Ipinapaliwanag \nng buong <a\nhref=\"http://creativecommons.org/licenses/by-sa/2.0/legalcode\">kodigong pambatas</a> \nang mga karapatan at mga pananagutan mo."
+      intro_2_html: "Malaya mong makokopya, maipapamahagi, maipahahatid at mahahalaw ang aming mga dato,\nbasta't babanggitin mo ang OpenStreetMap at ang mga tagapag-ambag\nnito. Kapag binago mo o nagbuo sa pamamagitan ng aming mga dato, maaari\nmong ipamahagi ang resulta sa ilalim lamang ng katulad na lisensiya. Ipinapaliwanag \nng buong <a\nhref=\"http://opendatacommons.org/licenses/odbl/1.0/\">kodigong pambatas</a> \nang mga karapatan at mga pananagutan mo."
+      intro_3_html: "Ang kartograpya sa aming mga tile na mapa at ang aming dokumentasyon ay lisensyado sa ilalim ng <a\nhref=\"http://creativecommons.org/licenses/by-sa/2.0/\">lisensiyang Creative\nCommons Attribution-ShareAlike 2.0</a> (CC BY-SA)."
       more_1_html: "Magbasa ng mas marami pa hinggil sa paggamit ng dato namin doon sa <a\nhref=\"http://wiki.openstreetmap.org/wiki/Legal_FAQ\">Mga Palaging Itinatanong \nna Makabatas</a>."
       more_2_html: "Ipinapaalala sa mga tagapag-ambag ng OpenStreetMap (OSM) na huwag kailanman magdaragdag ng dato magmula sa anumang\nmga pinagmulan na mayroong karapatan sa paglalathala (halimbawa na ang Google Maps o nakalimbag na mga mapa) na wala\nang malinaw na kapahintulutan magmula sa mga tagapaghawak ng karapatan sa paglalathala."
       more_title_html: Ang pagtuklas ng mas marami pang iba
@@ -1177,11 +1171,8 @@ tl:
       subject: "[OpenStreetMap] Tiyakin ang iyong tirahan ng e-liham"
     signup_confirm_html: 
       ask_questions: Maaari kang magtanong ng anumang mga katanungang mayroon ka hinggil sa OpenStreetMap doon sa aming <a href="http://help.openstreetmap.org/">pook ng katanungan at kasagutan</a>.
-      click_the_link: Kung ikaw ito, maligayang pagdating! Mangyaring pindutin ang kawing na nasa ibaba upang tiyakin ang akawnt na iyan at magbasa pa para sa mas marami pang kabatiran hinggil sa OpenStreetMap
       current_user: Isang talaan ng pangkasalukuyang mga tagagamit sa loob ng mga kategorya, na nakabatay kung saan sa mundo sila naroroon, ang makukuha mula sa <a href="http://wiki.openstreetmap.org/wiki/Category:Users_by_geographical_region">Kategorya:Mga_tagagamit_ayon_sa_rehiyong_pangheograpiya</a>.
       get_reading: Kumuha ng mababasa tungkol sa OpenStreetMap <a href="http://wiki.openstreetmap.org/wiki/Beginners%27_Guide">doon sa wiki</a>, humabol sa pinakahuling mga balita sa pamamagitan ng <a href="http://blog.openstreetmap.org/">blog ng OpenStreetMap</a> o <a href="http://twitter.com/openstreetmap">Twitter</a>, o tumingin-tingin sa kahabaan ng  <a href="http://www.opengeodata.org/">blog ng OpenGeoData</a> ng tagapagtatag ng OpenStreetMap na si Steve Coast para sa nakatapayang kasaysayan ng proyekto, na mayroon ding <a href="http://www.opengeodata.org/?cat=13">mga podkast na mapakikinggan</a>!
-      greeting: Kumusta ka diyan!
-      hopefully_you: May isang tao (ikaw sana) ang may nais na lumikha ng isang akawnt doon sa
       introductory_video: Maaari kang manood ng isang %{introductory_video_link}.
       more_videos: Mayroong mga %{more_videos_link}.
       more_videos_here: marami pang mga bidyo rito
@@ -1191,19 +1182,11 @@ tl:
     signup_confirm_plain: 
       ask_questions: "Maaari kang magtanong ng anumang mga katanungang mayroon ka hinggil sa OpenStreetMap doon sa aming lugar ng katanungan at kasagutan:"
       blog_and_twitter: "Humabol sa pinakahuling mga balita sa pamamagitan ng blog ng OpenStreetMap o Twitter:"
-      click_the_link_1: Kung ikaw ito, maligayang pagdating! Mangyaring pindutin ang kawing na nasa ibaba upang tiyakin ang iyong
-      click_the_link_2: akawnt at magbasa pa para sa mas marami pang kabatiran tungkol sa OpenStreetMap.
-      current_user_1: Isang talaan ng  pangkasalukuyang mga tagagamit na nasa mga kategorya, na nakabatay sa kung saan sa mundo
-      current_user_2: "sila naroroon, ay makukuha magmula sa:"
-      greeting: Kumusta ka diyan!
-      hopefully_you: May isang tao (ikaw sana) ang may nais na lumikha ng isang akawnt doon sa
       introductory_video: "Maaari kang makapanood ng isang bidyo ng pagpapakilala sa OpenStreetMap dito:"
       more_videos: "May marami pang mga bidyo rito:"
       opengeodata: "Ang OpenGeoData.org ay ang blog ng tagapagtatag ng OpenStreetMap na si Steve Coast, at mayroon din itong mga podkast:"
       the_wiki: "Kumuha ng mababasa tungkol sa OpenStreetMap doon sa wiki:"
       the_wiki_url: http://wiki.openstreetmap.org/wiki/Beginners%27_Guide
-      user_wiki_1: Iminumungkahing lumikha ka ng isang pahina ng wiki ng tagagamit, na may kasamang
-      user_wiki_2: mga tatak ng kategorya na nagtatala kung nasaan ka, katulad ng [[Kategorya:Mga tagagamit_sa_Londres]].
       wiki_signup: "Marahil ay nais mo ring magpatala sa wiki ng OpenStreetMap doon sa:"
       wiki_signup_url: http://wiki.openstreetmap.org/index.php?title=Special:Userlogin&type=signup&returnto=Main_Page
   oauth: 

@@ -206,8 +206,6 @@ eu:
         cities: Hiriak
         places: Lekuak
         towns: Herriak
-    description_osm_namefinder: 
-      prefix: "%{type}tik %{distance} %{direction}ra"
     direction: 
       east: ekialde
       north: iparra
@@ -221,8 +219,6 @@ eu:
       one: km bat inguru
       other: "%{count}km inguru"
       zero: km bat baino gutxiago
-    search_osm_namefinder: 
-      suffix_place: ", %{placename}tik %{distance} %{direction}ra"
     search_osm_nominatim: 
       prefix: 
         amenity: 
@@ -573,12 +569,9 @@ eu:
     message_notification: 
       hi: Kaixo %{to_user},
     signup_confirm_html: 
-      greeting: Kaixo!
       introductory_video: "%{introductory_video_link} ikus dezakezu."
       more_videos: "%{more_videos_link} daude."
       more_videos_here: bideo gehiago hemen
-    signup_confirm_plain: 
-      greeting: Kaixo!
   oauth: 
     oauthorize: 
       allow_write_api: mapa aldatu.
