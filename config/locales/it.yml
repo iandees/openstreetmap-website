@@ -207,14 +207,10 @@ it:
         node: Nodo
         relation: Relazione
         way: Percorso
-    start: 
-      manually_select: Seleziona manualmente un'area differente
-      view_data: Mostra i dati per la visualizzazione attuale della mappa
     start_rjs: 
       data_frame_title: Dati
       data_layer_name: Esplora Dati Mappa
       details: Dettagli
-      drag_a_box: Tracciare un riquadro sulla mappa per selezionare un'area
       edited_by_user_at_timestamp: Modificato da %{user} il %{timestamp}
       hide_areas: Nascondi le aree
       history_for_feature: Storico per %{feature}
@@ -242,6 +238,7 @@ it:
       show_areas: Mostra le aree
       show_history: Visualizza storico
       unable_to_load_size: "Impossibile caricare: la dimensione del riquadro di selezione di %{bbox_size} è troppo grande (deve essere minore di %{max_bbox_size})"
+      view_data: Mostra i dati per la visualizzazione attuale della mappa
       wait: Attendere...
       zoom_or_select: Ingrandire oppure selezionare l'area della mappa che si desidera visualizzare
     tag_details: 
@@ -331,8 +328,9 @@ it:
       hide_link: Nascondi questo commento
     diary_entry: 
       comment_count: 
-        one: 1 commento
+        one: "%{count} commento"
         other: "%{count} commenti"
+        zero: Nessun commento
       comment_link: Commento su questa voce
       confirm: Conferma
       edit_link: Modifica questa voce
