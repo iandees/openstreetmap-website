@@ -24,7 +24,7 @@ class ChangesetController < ApplicationController
   def create
     assert_method :put
 
-    cs = Changeset.from_xml(request.raw_post, true)
+    cs = Changeset.from_format(request.content_mime_type, request.raw_post, true)
 
     # Assume that Changeset.from_xml has thrown an exception if there is an error parsing the xml
     cs.user_id = @user.id
@@ -235,7 +235,7 @@ class ChangesetController < ApplicationController
     assert_method :put
 
     changeset = Changeset.find(params[:id])
-    new_changeset = Changeset.from_xml(request.raw_post)
+    new_changeset = Changeset.from_format(request.content_mime_type, request.raw_post)
 
     unless new_changeset.nil?
       check_changeset_consistency(changeset, @user)

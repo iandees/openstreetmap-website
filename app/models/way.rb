@@ -29,6 +29,15 @@ class Way < ActiveRecord::Base
   scope :visible, where(:visible => true)
   scope :invisible, where(:visible => false)
 
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    else
+      raise OSM::APINotAcceptable.new("way", format)
+    end
+  end
+
   # Read in xml as text and return it's Way object representation
   def self.from_xml(xml, create=false)
     begin

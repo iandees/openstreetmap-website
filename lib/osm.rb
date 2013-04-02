@@ -281,6 +281,24 @@ module OSM
     end
   end
 
+  ##
+  # raised when the API encounters a content-type which it
+  # is unable to handle.
+  class APINotAcceptable < APIError
+    def initialize(type, mime)
+      @type = type
+      @mime = mime
+    end
+
+    def status
+      :not_acceptable
+    end
+
+    def to_s
+      "Cannot accept requests with content type #{@mime.inspect} when parsing #{@type}."
+    end
+  end
+
   # Helper methods for going to/from mercator and lat/lng.
   class Mercator
     include Math

@@ -13,7 +13,7 @@ class WayController < ApplicationController
   def create
     assert_method :put
 
-    way = Way.from_xml(request.raw_post, true)
+    way = Way.from_format(request.content_mime_type, request.raw_post, true)
     
     if way
       way.create_with_history @user
@@ -37,7 +37,7 @@ class WayController < ApplicationController
 
   def update
     way = Way.find(params[:id])
-    new_way = Way.from_xml(request.raw_post)
+    new_way = Way.from_format(request.content_mime_type, request.raw_post)
     
     if new_way and new_way.id == way.id
       way.update_from(new_way, @user)
@@ -50,7 +50,7 @@ class WayController < ApplicationController
   # This is the API call to delete a way
   def delete
     way = Way.find(params[:id])
-    new_way = Way.from_xml(request.raw_post)
+    new_way = Way.from_format(request.content_mime_type, request.raw_post)
     
     if new_way and new_way.id == way.id
       way.delete_with_history!(new_way, @user)

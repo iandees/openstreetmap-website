@@ -32,6 +32,15 @@ class Relation < ActiveRecord::Base
 
   TYPES = ["node", "way", "relation"]
 
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    else
+      raise OSM::APINotAcceptable.new("relation", format)
+    end
+  end
+
   def self.from_xml(xml, create=false)
     begin
       p = XML::Parser.string(xml)

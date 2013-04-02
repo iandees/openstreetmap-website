@@ -16,9 +16,9 @@ class NodeController < ApplicationController
   def create
     assert_method :put
 
-    node = Node.from_xml(request.raw_post, true)
+    node = Node.from_format(request.content_mime_type, request.raw_post, true)
 
-    # Assume that Node.from_xml has thrown an exception if there is an error parsing the xml
+    # Assume that Node.from_format has thrown an exception if there is an error parsing the xml
     node.create_with_history @user
     render :text => node.id.to_s, :content_type => "text/plain"
   end
@@ -37,7 +37,7 @@ class NodeController < ApplicationController
   # Update a node from given XML
   def update
     node = Node.find(params[:id])
-    new_node = Node.from_xml(request.raw_post)
+    new_node = Node.from_format(request.content_mime_type, request.raw_post)
        
     unless new_node and new_node.id == node.id
       raise OSM::APIBadUserInput.new("The id in the url (#{node.id}) is not the same as provided in the xml (#{new_node.id})")
@@ -51,7 +51,7 @@ class NodeController < ApplicationController
   # method returns the new version number.
   def delete
     node = Node.find(params[:id])
-    new_node = Node.from_xml(request.raw_post)
+    new_node = Node.from_format(request.content_mime_type, request.raw_post)
     
     unless new_node and new_node.id == node.id
       raise OSM::APIBadUserInput.new("The id in the url (#{node.id}) is not the same as provided in the xml (#{new_node.id})")

@@ -63,6 +63,15 @@ class Node < ActiveRecord::Base
                        :limit => MAX_NUMBER_OF_NODES+1)
   end
 
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    else
+      raise OSM::APINotAcceptable.new("node", format)
+    end
+  end
+
   # Read in xml as text and return it's Node object representation
   def self.from_xml(xml, create=false)
     begin
