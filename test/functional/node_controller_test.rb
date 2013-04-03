@@ -28,6 +28,8 @@ class NodeControllerTest < ActionController::TestCase
     )
   end
 
+  #### test XML methods ####
+
   def test_create
     # cannot read password from fixture as it is stored as MD5 digest
     ## First try with no auth
@@ -468,12 +470,159 @@ class NodeControllerTest < ActionController::TestCase
     assert apinode.tags.include?('#{@user.inspect}')
   end
 
+  #### JSON methods ####
+
+  def test_create_json
+    basic_authorization(users(:public_user).email, "test")
+    
+    # create a node with random lat/lon
+    lat = rand(100)-50 + rand
+    lon = rand(100)-50 + rand
+    # normal user has a changeset open, so we'll use that.
+    changeset = changesets(:public_user_first_change)
+    # create a minimal xml file
+    content("{\"lat\": #{lat}, \"lon\": #{lon}, \"changeset\": #{changeset.id}}")
+    content_type("application/json")
+    put :create
+    # hope for success
+    assert_response :success, "node upload did not return success status"
+
+    # read id of created node and search for it
+    nodeid = @response.body
+    checknode = Node.find(nodeid)
+    assert_not_nil checknode, "uploaded node not found in data base after upload"
+    # compare values
+    assert_in_delta lat * 10000000, checknode.latitude, 1, "saved node does not match requested latitude"
+    assert_in_delta lon * 10000000, checknode.longitude, 1, "saved node does not match requested longitude"
+    assert_equal changesets(:public_user_first_change).id, checknode.changeset_id, "saved node does not belong to changeset that it was created in"
+    assert_equal true, checknode.visible, "saved node is not visible"
+  end
+
+  def test_create_invalid_json
+    ## Only test public user here, as test_create should cover what's the forbiddens
+    ## that would occur here
+    # Initial setup
+    basic_authorization(users(:public_user).email, "test")
+    # normal user has a changeset open, so we'll use that.
+    changeset = changesets(:public_user_first_change)
+    lat = 3.434
+    lon = 3.23
+    
+    # test that the upload is rejected when json is valid, but osm doc isn't
+    content("[]")
+    content_type("application/json")
+    put :create
+    assert_response :bad_request, "node upload did not return bad_request status"
+    assert_equal "Cannot parse valid node from xml string []. is not an object.", @response.body
+
+    # test that the upload is rejected when no lat is supplied
+    # create a minimal xml file
+    content({'lon'=>lon, 'changeset'=>changeset.id}.to_json)
+    content_type("application/json")
+    put :create
+    # hope for success
+    assert_response :bad_request, "node upload did not return bad_request status"
+    assert_equal "Cannot parse valid node from xml string {\"lon\":#{lon},\"changeset\":#{changeset.id}}. lat missing", @response.body
+
+    # test that the upload is rejected when no lon is supplied
+    # create a minimal xml file
+    content({'lat'=>lat, 'changeset'=>changeset.id}.to_json)
+    content_type("application/json")
+    put :create
+    # hope for success
+    assert_response :bad_request, "node upload did not return bad_request status"
+    assert_equal "Cannot parse valid node from xml string {\"lat\":#{lat},\"changeset\":#{changeset.id}}. lon missing", @response.body
+
+    # test that the upload is rejected when we have a tag which is too long
+    content("{\"lat\": #{lat}, \"lon\": #{lon}, \"changeset\": #{changeset.id}, \"tags\": { \"foo\": \"#{'x'*256}\" } }")
+    content_type("application/json")
+    put :create
+    assert_response :bad_request, "node upload did not return bad_request status"
+    assert_equal ["NodeTag ", " v: is too long (maximum is 255 characters) (\"#{'x'*256}\")"], @response.body.split(/[0-9]+,foo:/)
+
+  end
+
+  ##
+  # test adding tags to a node
+  # def test_duplicate_tags_json
+  #   # setup auth
+  #   basic_authorization(users(:public_user).email, "test")
+
+  #   # add an identical tag to the node
+  #   tag_xml = XML::Node.new("tag")
+  #   tag_xml['k'] = current_node_tags(:public_v_t1).k
+  #   tag_xml['v'] = current_node_tags(:public_v_t1).v
+
+  #   # add the tag into the existing xml
+  #   node_xml = current_nodes(:public_visible_node).to_
+  #   node_xml.find("//osm/node").first << tag_xml
+
+  #   # try and upload it
+  #   content node_xml
+  #   put :update, :id => current_nodes(:public_visible_node).id
+  #   assert_response :bad_request, 
+  #     "adding duplicate tags to a node should fail with 'bad request'"
+  #   assert_equal "Element node/#{current_nodes(:public_visible_node).id} has duplicate tags with key #{current_node_tags(:t1).k}", @response.body
+  # end
+
+  # test whether string injection is possible
+  def test_string_injection_json
+    ## First try with the non-data public user
+    basic_authorization(users(:normal_user).email, "test")
+    changeset_id = changesets(:normal_user_first_change).id
+
+    # try and put something into a string that the API might 
+    # use unquoted and therefore allow code injection...
+    content "{\"lat\": 0, \"lon\": 0, \"changeset\": #{changeset_id}, \"tags\": {" +
+      '"#{@user.inspect}": "0"' +
+      '} }'
+    content_type("application/json")
+    put :create
+    assert_require_public_data "Shouldn't be able to create with non-public user"
+    
+    
+    ## Then try with the public data user
+    basic_authorization(users(:public_user).email, "test")
+    changeset_id = changesets(:public_user_first_change).id
+
+    # try and put something into a string that the API might 
+    # use unquoted and therefore allow code injection...
+    content "{\"lat\": 0, \"lon\": 0, \"changeset\": #{changeset_id}, \"tags\": {" +
+      '"#{@user.inspect}": "0"' +
+      '} }'
+    content_type("application/json")
+    put :create
+    assert_response :success
+    nodeid = @response.body
+
+    # find the node in the database
+    checknode = Node.find(nodeid)
+    assert_not_nil checknode, "node not found in data base after upload"
+
+    # TODO: use JSON here too
+    # and grab it using the api
+    get :read, :id => nodeid
+    assert_response :success
+    apinode = Node.from_xml(@response.body)
+    assert_not_nil apinode, "downloaded node is nil, but shouldn't be"
+    
+    # check the tags are not corrupted
+    assert_equal checknode.tags, apinode.tags
+    assert apinode.tags.include?('#{@user.inspect}')
+  end
+
+  #### utility methods ####
+
   def basic_authorization(user, pass)
     @request.env["HTTP_AUTHORIZATION"] = "Basic %s" % Base64.encode64("#{user}:#{pass}")
   end
 
   def content(c)
     @request.env["RAW_POST_DATA"] = c.to_s
+  end
+
+  def content_type(t)
+    @request.env["CONTENT_TYPE"] = t.to_s
   end
 
   ##
