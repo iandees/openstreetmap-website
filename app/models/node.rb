@@ -82,7 +82,7 @@ class Node < ActiveRecord::Base
       return Node.from_json_node(doc, create)
 
     rescue JSON::ParserError => ex
-      raise OSM::APIBadXMLError.new("node", xml, ex.message)
+      raise OSM::APIBadXMLError.new("node", json, ex.message)
     end
   end
 
