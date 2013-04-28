@@ -145,8 +145,8 @@ class Node < ActiveRecord::Base
 
     # Add in any tags from the XML
     pt.find('tag').each do |tag|
-      error.call("node", pt, "tag is missing key") if tag['k'].nil?
-      error.call("node", pt, "tag is missing value") if tag['v'].nil?
+      raise OSM::APIBadXMLError.new("node", pt, "tag is missing key") if tag['k'].nil?
+      raise OSM::APIBadXMLError.new("node", pt, "tag is missing value") if tag['v'].nil?
       node.add_tag_key_val(tag['k'],tag['v'])
     end
 
