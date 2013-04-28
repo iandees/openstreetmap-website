@@ -159,7 +159,9 @@ class Node < ActiveRecord::Base
     node = Node.from_hashlike_node(doc, create) {|typ, err_doc, msg| raise OSM::APIBadXMLError.new(typ, err_doc.to_json, msg) }
 
     if doc.has_key? 'tags'
-      doc['tags'].each do |k, v|
+      doc_tags = doc['tags']
+      raise OSM::APIBadXMLError.new("node", doc_tags.to_json, "node/tags is not an object") unless doc_tags.instance_of? Hash
+      doc_tags.each do |k, v|
         node.add_tag_key_val(k, v)
       end
     end
