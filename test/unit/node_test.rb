@@ -170,136 +170,59 @@ class NodeTest < ActiveSupport::TestCase
     changeset = 2
     version = 1
     noid = "<osm><node lat='#{lat}' lon='#{lon}' changeset='#{changeset}' version='#{version}' /></osm>"
-    # First try a create which doesn't need the id
-    assert_nothing_raised(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, noid, true)
-    }
-    # Now try an update with no id, and make sure that it gives the appropriate exception
-    message = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, noid, false)
-    }
-    assert_match /ID is required when updating./, message.message
+    check_error_attr_new_ok(noid, Mime::XML, /ID is required when updating./)
   end
   
   def test_from_xml_no_lat
     nolat = "<osm><node id='1' lon='23.3' changeset='2' version='23' /></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nolat, true)
-    }
-    assert_match /lat missing/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nolat, false)
-    }
-    assert_match /lat missing/, message_update.message
+    check_error_attr(nolat, Mime::XML, /lat missing/)
   end
   
   def test_from_xml_no_lon
     nolon = "<osm><node id='1' lat='23.1' changeset='2' version='23' /></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nolon, true)
-    }
-    assert_match /lon missing/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nolon, false)
-    }
-    assert_match /lon missing/, message_update.message
+    check_error_attr(nolon, Mime::XML, /lon missing/)
   end
 
   def test_from_xml_no_changeset_id
     nocs = "<osm><node id='123' lon='23.23' lat='23.1' version='23' /></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nocs, true)
-    }
-    assert_match /Changeset id is missing/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nocs, false)
-    }
-    assert_match /Changeset id is missing/, message_update.message
+    check_error_attr(nocs, Mime::XML, /Changeset id is missing/)
   end
   
   def test_from_xml_no_version
     no_version = "<osm><node id='123' lat='23' lon='23' changeset='23' /></osm>"
-    assert_nothing_raised(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_version, true)
-    }
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_version, false)
-    }
-    assert_match /Version is required when updating/, message_update.message
+    check_error_attr_new_ok(no_version, Mime::XML, /Version is required when updating/)
   end
   
   def test_from_xml_double_lat
-    nocs = "<osm><node id='123' lon='23.23' lat='23.1' lat='12' changeset='23' version='23' /></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nocs, true)
-    } 
-    assert_match /Fatal error: Attribute lat redefined at/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nocs, false)
-    }
-    assert_match /Fatal error: Attribute lat redefined at/, message_update.message
+    double_lat = "<osm><node id='123' lon='23.23' lat='23.1' lat='12' changeset='23' version='23' /></osm>"
+    check_error_attr(double_lat, Mime::XML, /Fatal error: Attribute lat redefined at/)
   end
   
   def test_from_xml_id_zero
     id_list = ["", "0", "00", "0.0", "a"]
     id_list.each do |id|
       zero_id = "<osm><node id='#{id}' lat='12.3' lon='12.3' changeset='33' version='23' /></osm>"
-      assert_nothing_raised(OSM::APIBadUserInput) {
-        Node.from_format(Mime::XML, zero_id, true)
-      }
-      message_update = assert_raise(OSM::APIBadUserInput) {
-        Node.from_format(Mime::XML, zero_id, false)
-      }
-      assert_match /ID of node cannot be zero when updating/, message_update.message
+      check_error_attr_new_ok(zero_id, Mime::XML, /ID of node cannot be zero when updating/, OSM::APIBadUserInput)
     end
   end
   
   def test_from_xml_no_text
-    no_text = ""
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_text, true)
-    }
-    assert_match /Must specify a string with one or more characters/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_text, false)
-    }
-    assert_match /Must specify a string with one or more characters/, message_update.message
+    check_error_attr("", Mime::XML, /Must specify a string with one or more characters/)
   end
   
   def test_from_xml_no_node
     no_node = "<osm></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_node, true)
-    }
-    assert_match /XML doesn't contain an osm\/node element/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_node, false)
-    }
-    assert_match /XML doesn't contain an osm\/node element/, message_update.message
+    check_error_attr(no_node, Mime::XML, /XML doesn't contain an osm\/node element/)
   end
   
   def test_from_xml_no_k_v
     nokv = "<osm><node id='23' lat='12.3' lon='23.4' changeset='12' version='23'><tag /></node></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nokv, true)
-    }
-    assert_match /tag is missing key/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, nokv, false)
-    }
-    assert_match /tag is missing key/, message_update.message
+    check_error_attr(nokv, Mime::XML, /tag is missing key/)
   end
   
   def test_from_xml_no_v
     no_v = "<osm><node id='23' lat='23.43' lon='23.32' changeset='23' version='32'><tag k='key' /></node></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_v, true)
-    }
-    assert_match /tag is missing value/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::XML, no_v, false)
-    }
-    assert_match /tag is missing value/, message_update.message
+    check_error_attr(no_v, Mime::XML, /tag is missing value/)
   end
   
   def test_from_xml_duplicate_k
@@ -316,13 +239,7 @@ class NodeTest < ActiveSupport::TestCase
 
   def test_from_json_no_id
     noid = {'lat' => 56.7, 'lon' => -2.3, 'changeset' => 2, 'version' => 1}.to_json
-    assert_nothing_raised(OSM::APIBadXMLError) {
-      Node.from_format(Mime::JSON, noid, true)
-    }
-    message = assert_raise(OSM::APIBadXMLError) {
-      Node.from_format(Mime::JSON, noid, false)
-    }
-    assert_match /ID is required when updating./, message.message
+    check_error_attr_new_ok(noid, Mime::JSON, /ID is required when updating./)
   end
 
   def test_from_json_no_lat
