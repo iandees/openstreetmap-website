@@ -56,6 +56,63 @@ class RelationTest < ActiveSupport::TestCase
     assert_equal "Element relation/23 has duplicate tags with key dup", message_update.message
   end
 
+  def test_from_json_no_id
+    noid = {'changeset' => 2, 'version' => 1}.to_json
+    check_error_attr_new_ok(noid, Mime::JSON, /ID is required when updating/)
+  end
+
+  def test_from_json_no_changeset_id
+    nocs = {'id' => 123, 'version' => 23}.to_json
+    check_error_attr(nocs, Mime::JSON, /Changeset id is missing/)
+  end
+
+  def test_from_json_no_version
+    no_version = {'id' => 123, 'changeset' => 23}.to_json
+    check_error_attr_new_ok(no_version, Mime::JSON, /Version is required when updating/)
+  end
+
+  ## NOTE: the "double attribute" errors which we raise in XML mode don't apply here
+  ## the last value will silently overwrite any previous values. not sure if this should
+  ## be considered a bug, but needs reporting in the dev docs.
+
+  def test_from_json_id_zero
+    # first, testing some things which are 'zero' or otherwise invalid due to being
+    # invalid JSON
+    id_list = ["", "00", "a"]
+    id_list.each do |id|
+      zero_id = '{"id":' + id + ',"changeset":33,"version":33}'
+      check_error_attr(zero_id, Mime::JSON, /Cannot parse valid relation from xml string/)
+    end
+
+    # second, testing some things which are also 'zero', but should be rejected at
+    # a later check due to them being 'zero'.
+    id_list = ["0", "0.0", "\"\"", "\"0\"", "\"00\"", "\"0.0\"", "\"a\""]
+    id_list.each do |id|
+      zero_id = '{"id":' + id + ',"changeset":33,"version":33}'
+      check_error_attr_new_ok(zero_id, Mime::JSON, /ID of relation cannot be zero when updating/, OSM::APIBadUserInput)
+    end
+  end
+
+  def test_from_json_no_text
+    check_error_attr("", Mime::JSON, /A JSON text must at least contain two octets/)
+  end
+
+  # check that whether an item is in the JSON as a string or as a number
+  # doesn't make any difference to whether the relation object parses.
+  def test_from_json_quoting_unimportant
+    data = {'id' => 123, 'changeset' => 23, 'version' => 23}
+    data.keys.each do |k|
+      data_quoted = data.clone
+      data_quoted[k] = data_quoted[k].to_s
+      assert_nothing_raised(OSM::APIBadUserInput) {
+        Relation.from_format(Mime::JSON, data_quoted.to_json, true)
+      }
+      assert_nothing_raised(OSM::APIBadUserInput) {
+        Relation.from_format(Mime::JSON, data_quoted.to_json, false)
+      }
+    end
+  end
+
   #### utility methods ####
 
   # most attributes report faults in the same way, so we can abstract

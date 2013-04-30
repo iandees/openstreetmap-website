@@ -36,6 +36,8 @@ class Relation < ActiveRecord::Base
     case format
     when Mime::XML, nil
       self.from_xml(data, create)
+    when Mime::JSON
+      self.from_json(data, create)
     else
       raise OSM::APINotAcceptable.new("relation", format)
     end
@@ -55,16 +57,30 @@ class Relation < ActiveRecord::Base
     end
   end
 
-  def self.from_xml_node(pt, create=false)
+  # parse a JSON doc and extract the relation from it
+  def self.from_json(json, create=false)
+    begin
+      doc = JSON.parse(json)
+      return Relation.from_json_node(doc, create)
+
+    rescue JSON::ParserError => ex
+      raise OSM::APIBadXMLError.new("relation", json, ex.message)
+    end
+  end
+
+  ##
+  # generate a relation from a hash-like structure, i.e: duck-typed on string
+  # lookup attributes with operator[].
+  def self.from_hashlike_node(pt, create=false, &error)
     relation = Relation.new
 
-    raise OSM::APIBadXMLError.new("relation", pt, "Version is required when updating") unless create or not pt['version'].nil?
+    error.call("relation", pt, "Version is required when updating") unless create or not pt['version'].nil?
     relation.version = pt['version']
-    raise OSM::APIBadXMLError.new("relation", pt, "Changeset id is missing") if pt['changeset'].nil?
+    error.call("relation", pt, "Changeset id is missing") if pt['changeset'].nil?
     relation.changeset_id = pt['changeset']
     
     unless create
-      raise OSM::APIBadXMLError.new("relation", pt, "ID is required when updating") if pt['id'].nil?
+      error.call("relation", pt, "ID is required when updating") if pt['id'].nil?
       relation.id = pt['id'].to_i
       # .to_i will return 0 if there is no number that can be parsed. 
       # We want to make sure that there is no id with zero anyway
@@ -78,6 +94,12 @@ class Relation < ActiveRecord::Base
 
     # Start with no tags
     relation.tags = Hash.new
+
+    return relation
+  end
+
+  def self.from_xml_node(pt, create=false)
+    relation = Relation.from_hashlike_node(pt, create) {|typ, err_pt, msg| raise OSM::APIBadXMLError.new(typ, err_pt, msg) }
 
     # Add in any tags from the XML
     pt.find('tag').each do |tag|
@@ -93,17 +115,43 @@ class Relation < ActiveRecord::Base
     relation.members = Array.new
 
     pt.find('member').each do |member|
-      #member_type = 
-      logger.debug "each member"
       raise OSM::APIBadXMLError.new("relation", pt, "The #{member['type']} is not allowed only, #{TYPES.inspect} allowed") unless TYPES.include? member['type']
-      logger.debug "after raise"
-      #member_ref = member['ref']
-      #member_role
       member['role'] ||= "" # Allow  the upload to not include this, in which case we default to an empty string.
-      logger.debug member['role']
       relation.add_member(member['type'].classify, member['ref'], member['role'])
     end
-    raise OSM::APIBadUserInput.new("Some bad xml in relation") if relation.nil?
+
+    return relation
+  end
+
+  def self.from_json_node(doc, create=false)
+    raise OSM::APIBadXMLError.new("relation", doc.to_json, "is not an object.") unless doc.instance_of? Hash
+    relation = Relation.from_hashlike_node(doc, create) {|typ, err_doc, msg| raise OSM::APIBadXMLError.new(typ, err_doc.to_json, msg) }
+
+    # Add in any tags from the JSON
+    if doc.has_key? 'tags'
+      doc_tags = doc['tags']
+      raise OSM::APIBadXMLError.new("relation", doc_tags.to_json, "relation/tags is not an object") unless doc_tags.instance_of? Hash
+      doc_tags.each do |k, v|
+        relation.add_tag_keyval(k, v)
+      end
+    end
+
+    # need to initialise the relation members array explicitly, as if this
+    # isn't done for a new relation then @members attribute will be nil, 
+    # and the members will be loaded from the database instead of being 
+    # empty, as intended.
+    relation.members = Array.new
+
+    if doc.has_key? 'members'
+      doc_members = doc['members']
+      raise OSM::APIBadXMLError.new("relation", doc_members.to_json, "relation/members is not an array") unless doc_members.instance_of? Array
+      doc_members.each do |member|
+        raise OSM::APIBadXMLError.new("relation", member.to_json, "relation/member is not an object") unless member.instance_of? Hash
+        raise OSM::APIBadXMLError.new("relation", member.to_json, "The #{member['type']} is not allowed only, #{TYPES.inspect} allowed") unless TYPES.include? member['type']
+        member['role'] ||= "" # Allow  the upload to not include this, in which case we default to an empty string.
+        relation.add_member(member['type'].classify, member['ref'], member['role'].to_s)
+      end
+    end
 
     return relation
   end
