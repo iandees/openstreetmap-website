@@ -101,7 +101,9 @@ fur:
       deleted: Eliminât
       edit: 
         area: Modifiche aree
+        node: Modifiche il grop
         relation: Modifiche relazion
+        way: Modifiche la vie
       larger: 
         area: Viôt la aree suntune mape plui grande
         node: Viôt il grop suntune mape plui grande
@@ -478,6 +480,7 @@ fur:
           sauna: Saune
           school: Scuele
           shop: Buteghe
+          social_centre: Centri sociâl
           supermarket: Supermarcjât
           swimming_pool: Pissine
           taxi: Taxi
@@ -525,6 +528,8 @@ fur:
           cemetery: Simiteri
           commercial: Aree comerciâl
           construction: In costruzion
+          forest: Bosc
+          grass: Prât
           industrial: Aree industriâl
           military: Aree militâr
           mine: Miniere
@@ -547,12 +552,16 @@ fur:
           swimming_pool: Pissine
           track: Piste pe corse
           water_park: Parc acuatic
+        military: 
+          barracks: Caserme
         natural: 
           bay: Rade
           beach: Splaze
           channel: Canâl
           crater: Cratêr
+          dune: Dune
           fjord: Fiort
+          forest: Bosc
           glacier: Glaçâr
           hill: Culine
           island: Isule
@@ -565,6 +574,8 @@ fur:
         office: 
           architect: Architet
           government: Ufizi governatîf
+          insurance: Agjenzie di assicurazions
+          travel_agent: Agjenzie di viaçs
           "yes": Ufizi
         place: 
           airport: Aeropuart
@@ -598,9 +609,11 @@ fur:
           tram_stop: Fermade dal tram
         shop: 
           bakery: Pancôr
+          beauty: Centri estetic
           bicycle: Buteghe di bicicletis
           books: Librerie
           butcher: Becjarie
+          car_parts: Tocs par machinis
           car_repair: Riparazion di machinis
           carpet: Buteghe di tapêts
           clothes: Buteghe di vistîts
@@ -626,6 +639,8 @@ fur:
           valley: Val
           viewpoint: Pont panoramic
           zoo: Zoo
+        tunnel: 
+          "yes": Galarie
         waterway: 
           canal: Canâl
           dam: Dighe
@@ -713,7 +728,7 @@ fur:
       date: Date
       from: Di
       messages: Tu âs %{new_messages} e %{old_messages}
-      my_inbox: I miei messaç in jentrade
+      my_inbox: I miei messaçs in jentrade
       new_messages: 
         one: "%{count} messaç gnûf"
         other: "%{count} messaçs gnûfs"
@@ -893,6 +908,7 @@ fur:
             - Comugnâi
             - prâts
           construction: Stradis in costruzion
+          forest: Bosc
           golf: Troi di golf
           industrial: Aree industriâl
           lake: 
@@ -1087,7 +1103,9 @@ fur:
     go_public: 
       flash success: Ducj i tiei cambiaments a son cumò publics e tu puedis za scomençâ a lavorâ.
     list: 
+      confirm: Conferme i utents selezionâts
       heading: Utents
+      hide: Plate i utents selezionâts
       showing: 
         one: Pagjine %{page} (%{first_item} su %{items})
         other: Pagjine %{page} (%{first_item}-%{last_item} su %{items})
@@ -1264,8 +1282,10 @@ fur:
       show: Cjale chest bloc
       submit: Inzorne bloc
     helper: 
+      time_future: Finìs ca di %{time}.
       time_past: Finît %{time} indaûr.
     index: 
+      empty: No son stâts metûts blocs fin cumò.
       heading: Liste dai blocs dal utent
       title: Blocs dal utent
     new: 
@@ -1294,6 +1314,7 @@ fur:
       other: "%{count} oris"
     revoke: 
       revoke: Revoche!
+      time_future: Chest bloc al finìs ca di %{time}.
     show: 
       back: Cjale ducj i blocs
       confirm: Sêstu sigûr?
@@ -1307,6 +1328,8 @@ fur:
       time_future: Finìs ca di %{time}
       time_past: Finît %{time} indaûr
       title: "%{block_on} blocât di %{block_by}"
+    update: 
+      success: Bloc inzornât.
   user_role: 
     grant: 
       confirm: Conferme
