@@ -2,6 +2,7 @@
 //= require index/browse
 //= require index/export
 //= require index/key
+//= require index/notes
 
 $(document).ready(function () {
   var permalinks = $("#permalink").detach().html();
@@ -55,6 +56,10 @@ $(document).ready(function () {
                      [data.maxLat, data.maxLon]]);
     } else {
       map.setView(centre, data.zoom);
+    }
+
+    if (data.type && data.id) {
+      addObjectToMap(data, true);
     }
 
     if (marker) {

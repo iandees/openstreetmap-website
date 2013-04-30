@@ -55,6 +55,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_oauth
+    @oauth = @user.access_token(OAUTH_KEY) if @user and defined? OAUTH_KEY
+  end
+
   ##
   # requires the user to be logged in by the token or HTTP methods, or have an 
   # OAuth token with the right capability. this method is a bit of a pain to call 
@@ -111,6 +115,9 @@ class ApplicationController < ActionController::Base
   end
   def require_allow_write_gpx
     require_capability(:allow_write_gpx)
+  end
+  def require_allow_write_notes
+    require_capability(:allow_write_notes)
   end
 
   ##
@@ -274,7 +281,7 @@ class ApplicationController < ActionController::Base
 
       render :text => result.to_s, :content_type => "text/xml"
     else
-      render :text => message, :status => status
+      render :text => message, :status => status, :content_type => "text/plain"
     end
   end
   
