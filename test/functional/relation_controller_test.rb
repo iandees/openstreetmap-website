@@ -775,6 +775,141 @@ OSM
                    "relation contains members but they should have all been deleted")
     end
   end
+
+  # -------------------------------------
+  # Test simple relation creation.
+  # -------------------------------------
+
+  def test_create_json
+    basic_authorization users(:public_user).email, "test"
+    
+    # put the relation in a dummy fixture changset
+    changeset_id = changesets(:public_user_first_change).id
+
+    # create an relation without members
+    content({'relations'=>{'changeset'=>changeset_id,'tags'=>{'test'=>'yes'}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # hope for success
+    assert_response :success, 
+        "relation upload did not return success status"
+    # read id of created relation and search for it
+    relationid = @response.body
+    checkrelation = Relation.find(relationid)
+    assert_not_nil checkrelation, 
+        "uploaded relation not found in data base after upload"
+    # compare values
+    assert_equal checkrelation.members.length, 0, 
+        "saved relation contains members but should not"
+    assert_equal checkrelation.tags.length, 1, 
+        "saved relation does not contain exactly one tag"
+    assert_equal changeset_id, checkrelation.changeset.id,
+        "saved relation does not belong in the changeset it was assigned to"
+    assert_equal users(:public_user).id, checkrelation.changeset.user_id, 
+        "saved relation does not belong to user that created it"
+    assert_equal true, checkrelation.visible, 
+        "saved relation is not visible"
+    # ok the relation is there but can we also retrieve it?
+    get :read, :id => relationid
+    assert_response :success
+
+
+    ###
+    # create an relation with a node as member
+    # This time try with a role attribute in the relation
+    nid = current_nodes(:used_node_1).id
+    content({'relations'=>{'changeset'=>changeset_id,'members'=>{'ref'=>nid,'type'=>'node','role'=>'some'},'tags'=>{'test'=>'yes'}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # hope for success
+    assert_response :success, 
+        "relation upload did not return success status"
+    # read id of created relation and search for it
+    relationid = @response.body
+    checkrelation = Relation.find(relationid)
+    assert_not_nil checkrelation, 
+        "uploaded relation not found in data base after upload"
+    # compare values
+    assert_equal checkrelation.members.length, 1, 
+        "saved relation does not contain exactly one member"
+    assert_equal checkrelation.tags.length, 1, 
+        "saved relation does not contain exactly one tag"
+    assert_equal changeset_id, checkrelation.changeset.id,
+        "saved relation does not belong in the changeset it was assigned to"
+    assert_equal users(:public_user).id, checkrelation.changeset.user_id, 
+        "saved relation does not belong to user that created it"
+    assert_equal true, checkrelation.visible, 
+        "saved relation is not visible"
+    # ok the relation is there but can we also retrieve it?
+    
+    get :read, :id => relationid
+    assert_response :success
+    
+    
+    ###
+    # create an relation with a node as member, this time test that we don't 
+    # need a role attribute to be included
+    nid = current_nodes(:used_node_1).id
+    content({'relations'=>{'changeset'=>changeset_id,'members'=>{'ref'=>nid,'type'=>'node'},'tags'=>{'test'=>'yes'}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # hope for success
+    assert_response :success, 
+        "relation upload did not return success status"
+    # read id of created relation and search for it
+    relationid = @response.body
+    checkrelation = Relation.find(relationid)
+    assert_not_nil checkrelation, 
+        "uploaded relation not found in data base after upload"
+    # compare values
+    assert_equal checkrelation.members.length, 1, 
+        "saved relation does not contain exactly one member"
+    assert_equal checkrelation.tags.length, 1, 
+        "saved relation does not contain exactly one tag"
+    assert_equal changeset_id, checkrelation.changeset.id,
+        "saved relation does not belong in the changeset it was assigned to"
+    assert_equal users(:public_user).id, checkrelation.changeset.user_id, 
+        "saved relation does not belong to user that created it"
+    assert_equal true, checkrelation.visible, 
+        "saved relation is not visible"
+    # ok the relation is there but can we also retrieve it?
+    
+    get :read, :id => relationid
+    assert_response :success
+
+    ###
+    # create an relation with a way and a node as members
+    nid = current_nodes(:used_node_1).id
+    wid = current_ways(:used_way).id
+    content({'relations'=>{
+                'changeset'=>changeset_id,
+                'members'=>[{'ref'=>nid,'type'=>'node','role'=>'some'},{'ref'=>wid,'type'=>'way','role'=>'other'}],
+                'tags'=>{'test'=>'yes'}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # hope for success
+    assert_response :success, 
+        "relation upload did not return success status"
+    # read id of created relation and search for it
+    relationid = @response.body
+    checkrelation = Relation.find(relationid)
+    assert_not_nil checkrelation, 
+        "uploaded relation not found in data base after upload"
+    # compare values
+    assert_equal checkrelation.members.length, 2, 
+        "saved relation does not have exactly two members"
+    assert_equal checkrelation.tags.length, 1, 
+        "saved relation does not contain exactly one tag"
+    assert_equal changeset_id, checkrelation.changeset.id,
+        "saved relation does not belong in the changeset it was assigned to"
+    assert_equal users(:public_user).id, checkrelation.changeset.user_id, 
+        "saved relation does not belong to user that created it"
+    assert_equal true, checkrelation.visible, 
+        "saved relation is not visible"
+    # ok the relation is there but can we also retrieve it?
+    get :read, :id => relationid
+    assert_response :success
+  end
   
   # ============================================================
   # utility functions
@@ -956,5 +1091,9 @@ OSM
   def xml_parse(xml)
     parser = XML::Parser.string(xml)
     parser.parse
+  end
+
+  def content_type(t)
+    @request.env["CONTENT_TYPE"] = t.to_s
   end
 end

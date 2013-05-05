@@ -61,7 +61,18 @@ class Relation < ActiveRecord::Base
   def self.from_json(json, create=false)
     begin
       doc = JSON.parse(json)
-      return Relation.from_json_node(doc, create)
+
+      raise OSM::APIBadXMLError.new("relation", json, "JSON must be an object.") unless doc.instance_of?(Hash)
+      raise OSM::APIBadXMLError.new("relation", json, "JSON must contain a 'relations' key.") unless doc.has_key?('relations')
+
+      relations = doc['relations']
+      if relations.instance_of?(Hash)
+        return Relation.from_json_node(relations, create)
+      elsif relations.instance_of?(Array) and relations.length > 0
+        return Relation.from_json_node(relations[0], create)
+      else
+        raise OSM::APIBadXMLError.new("relation", json, "JSON 'relations' entry must be either an array or an object.")
+      end
 
     rescue JSON::ParserError => ex
       raise OSM::APIBadXMLError.new("relation", json, ex.message)
@@ -144,10 +155,17 @@ class Relation < ActiveRecord::Base
 
     if doc.has_key? 'members'
       doc_members = doc['members']
-      raise OSM::APIBadXMLError.new("relation", doc_members.to_json, "relation/members is not an array") unless doc_members.instance_of? Array
+      if doc_members.instance_of?(Hash)
+        doc_members = [doc_members]
+      else
+        raise OSM::APIBadXMLError.new("relation", doc_members.to_json, "relation/members is not an array or object") unless doc_members.instance_of? Array
+      end
       doc_members.each do |member|
         raise OSM::APIBadXMLError.new("relation", member.to_json, "relation/member is not an object") unless member.instance_of? Hash
-        raise OSM::APIBadXMLError.new("relation", member.to_json, "The #{member['type']} is not allowed only, #{TYPES.inspect} allowed") unless TYPES.include? member['type']
+        ['type', 'ref'].each do |required_key|
+          raise OSM::APIBadXMLError.new("relation", member.to_json, "key #{required_key.inspect} is required in relation/member object") unless member.has_key?(required_key)
+        end
+        raise OSM::APIBadXMLError.new("relation", member.to_json, "The type #{member['type']} is not allowed, only #{TYPES.inspect} allowed") unless TYPES.include? member['type']
         member['role'] ||= "" # Allow  the upload to not include this, in which case we default to an empty string.
         relation.add_member(member['type'].classify, member['ref'], member['role'].to_s)
       end

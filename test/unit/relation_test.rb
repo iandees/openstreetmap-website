@@ -57,17 +57,17 @@ class RelationTest < ActiveSupport::TestCase
   end
 
   def test_from_json_no_id
-    noid = {'changeset' => 2, 'version' => 1}.to_json
+    noid = {'relations'=>{'changeset' => 2, 'version' => 1}}.to_json
     check_error_attr_new_ok(noid, Mime::JSON, /ID is required when updating/)
   end
 
   def test_from_json_no_changeset_id
-    nocs = {'id' => 123, 'version' => 23}.to_json
+    nocs = {'relations'=>{'id' => 123, 'version' => 23}}.to_json
     check_error_attr(nocs, Mime::JSON, /Changeset id is missing/)
   end
 
   def test_from_json_no_version
-    no_version = {'id' => 123, 'changeset' => 23}.to_json
+    no_version = {'relations'=>{'id' => 123, 'changeset' => 23}}.to_json
     check_error_attr_new_ok(no_version, Mime::JSON, /Version is required when updating/)
   end
 
@@ -80,7 +80,7 @@ class RelationTest < ActiveSupport::TestCase
     # invalid JSON
     id_list = ["", "00", "a"]
     id_list.each do |id|
-      zero_id = '{"id":' + id + ',"changeset":33,"version":33}'
+      zero_id = '{"relations":{"id":' + id + ',"changeset":33,"version":33}}'
       check_error_attr(zero_id, Mime::JSON, /Cannot parse valid relation from xml string/)
     end
 
@@ -88,7 +88,7 @@ class RelationTest < ActiveSupport::TestCase
     # a later check due to them being 'zero'.
     id_list = ["0", "0.0", "\"\"", "\"0\"", "\"00\"", "\"0.0\"", "\"a\""]
     id_list.each do |id|
-      zero_id = '{"id":' + id + ',"changeset":33,"version":33}'
+      zero_id = '{"relations":{"id":' + id + ',"changeset":33,"version":33}}'
       check_error_attr_new_ok(zero_id, Mime::JSON, /ID of relation cannot be zero when updating/, OSM::APIBadUserInput)
     end
   end
@@ -105,10 +105,10 @@ class RelationTest < ActiveSupport::TestCase
       data_quoted = data.clone
       data_quoted[k] = data_quoted[k].to_s
       assert_nothing_raised(OSM::APIBadUserInput) {
-        Relation.from_format(Mime::JSON, data_quoted.to_json, true)
+        Relation.from_format(Mime::JSON, {'relations'=>data_quoted}.to_json, true)
       }
       assert_nothing_raised(OSM::APIBadUserInput) {
-        Relation.from_format(Mime::JSON, data_quoted.to_json, false)
+        Relation.from_format(Mime::JSON, {'relations'=>data_quoted}.to_json, false)
       }
     end
   end
