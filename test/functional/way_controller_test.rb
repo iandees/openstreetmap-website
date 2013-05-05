@@ -498,7 +498,7 @@ class WayControllerTest < ActionController::TestCase
   # Test simple way creation in JSON.
   # -------------------------------------
 
-  def test_create
+  def test_create_json
     nid1 = current_nodes(:used_node_1).id
     nid2 = current_nodes(:used_node_2).id
     basic_authorization users(:public_user).email, "test"
@@ -539,7 +539,7 @@ class WayControllerTest < ActionController::TestCase
   # Test creating some invalid ways in JSON.
   # -------------------------------------
 
-  def test_create_invalid
+  def test_create_invalid_json
     basic_authorization users(:public_user).email, "test"
 
     # use the first user's open changeset
@@ -585,10 +585,10 @@ class WayControllerTest < ActionController::TestCase
   end
 
   # -------------------------------------
-  # Test deleting ways.
+  # Test deleting ways in JSON.
   # -------------------------------------
   
-  def test_delete
+  def test_delete_json
     # set auth
     basic_authorization(users(:public_user).email, "test");  
 
