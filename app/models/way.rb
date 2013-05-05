@@ -59,7 +59,18 @@ class Way < ActiveRecord::Base
   def self.from_json(json, create=false)
     begin
       doc = JSON.parse(json)
-      return Way.from_json_node(doc, create)
+
+      raise OSM::APIBadXMLError.new("way", json, "JSON must be an object.") unless doc.instance_of?(Hash)
+      raise OSM::APIBadXMLError.new("way", json, "JSON must contain a 'ways' key.") unless doc.has_key?('ways')
+
+      ways = doc['ways']
+      if ways.instance_of?(Hash)
+        return Way.from_json_node(ways, create)
+      elsif ways.instance_of?(Array) and ways.length > 0
+        return Way.from_json_node(ways[0], create)
+      else
+        raise OSM::APIBadXMLError.new("way", json, "JSON 'ways' entry must be either an array or an object.")
+      end
 
     rescue JSON::ParserError => ex
       raise OSM::APIBadXMLError.new("way", json, ex.message)
@@ -128,9 +139,9 @@ class Way < ActiveRecord::Base
 
     if doc.has_key? 'nds'
       doc_nds = doc['nds']
-      raise OSM::APIBadXMLError.new("way", doc_nds.to_json, "way/nds is not an array") unless doc_tags.instance_of? Array
+      raise OSM::APIBadXMLError.new("way", doc_nds.to_json, "way/nds is not an array") unless doc_nds.instance_of? Array
       doc_nds.each do |nd|
-        way.add_nd_num(nd['ref'])
+        way.add_nd_num(nd.to_i)
       end
     end
 
