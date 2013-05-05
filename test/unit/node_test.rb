@@ -238,27 +238,27 @@ class NodeTest < ActiveSupport::TestCase
   end
 
   def test_from_json_no_id
-    noid = {'lat' => 56.7, 'lon' => -2.3, 'changeset' => 2, 'version' => 1}.to_json
+    noid = {'nodes'=>{'lat' => 56.7, 'lon' => -2.3, 'changeset' => 2, 'version' => 1}}.to_json
     check_error_attr_new_ok(noid, Mime::JSON, /ID is required when updating./)
   end
 
   def test_from_json_no_lat
-    nolat = {'id' => 1, 'lon' => 23.3, 'changeset' => 2, 'version' => 23}.to_json
+    nolat = {'nodes'=>{'id' => 1, 'lon' => 23.3, 'changeset' => 2, 'version' => 23}}.to_json
     check_error_attr(nolat, Mime::JSON, /lat missing/)
   end
 
   def test_from_json_no_lon
-    nolon = {'id' => 1, 'lat' => 23.1, 'changeset' => 2, 'version' => 23}.to_json
+    nolon = {'nodes'=>{'id' => 1, 'lat' => 23.1, 'changeset' => 2, 'version' => 23}}.to_json
     check_error_attr(nolon, Mime::JSON, /lon missing/)
   end
 
   def test_from_json_no_changeset_id
-    nocs = {'id' => 123, 'lon' => 23.23, 'lat' => 23.1, 'version' => 23}.to_json
+    nocs = {'nodes'=>{'id' => 123, 'lon' => 23.23, 'lat' => 23.1, 'version' => 23}}.to_json
     check_error_attr(nocs, Mime::JSON, /Changeset id is missing/)
   end
 
   def test_from_json_no_version
-    no_version = {'id' => 123, 'lat' => 23, 'lon' => 23, 'changeset' => 23}.to_json
+    no_version = {'nodes'=>{'id' => 123, 'lat' => 23, 'lon' => 23, 'changeset' => 23}}.to_json
     check_error_attr_new_ok(no_version, Mime::JSON, /Version is required when updating/)
   end
 
@@ -271,7 +271,7 @@ class NodeTest < ActiveSupport::TestCase
     # invalid JSON
     id_list = ["", "00", "a"]
     id_list.each do |id|
-      zero_id = '{"id":' + id + ',"lat":12.3,"lon":12.3,"changeset":33,"version":33}'
+      zero_id = '{"nodes":{"id":' + id + ',"lat":12.3,"lon":12.3,"changeset":33,"version":33}}'
       check_error_attr(zero_id, Mime::JSON, /Cannot parse valid node from xml string/)
     end
 
@@ -279,7 +279,7 @@ class NodeTest < ActiveSupport::TestCase
     # a later check due to them being 'zero'.
     id_list = ["0", "0.0", "\"\"", "\"0\"", "\"00\"", "\"0.0\"", "\"a\""]
     id_list.each do |id|
-      zero_id = '{"id":' + id + ',"lat":12.3,"lon":12.3,"changeset":33,"version":33}'
+      zero_id = '{"nodes":{"id":' + id + ',"lat":12.3,"lon":12.3,"changeset":33,"version":33}}'
       check_error_attr_new_ok(zero_id, Mime::JSON, /ID of node cannot be zero when updating/, OSM::APIBadUserInput)
     end
   end
@@ -296,10 +296,10 @@ class NodeTest < ActiveSupport::TestCase
       data_quoted = data.clone
       data_quoted[k] = data_quoted[k].to_s
       assert_nothing_raised(OSM::APIBadUserInput) {
-        Node.from_format(Mime::JSON, data_quoted.to_json, true)
+        Node.from_format(Mime::JSON, {'nodes'=>data_quoted}.to_json, true)
       }
       assert_nothing_raised(OSM::APIBadUserInput) {
-        Node.from_format(Mime::JSON, data_quoted.to_json, false)
+        Node.from_format(Mime::JSON, {'nodes'=>data_quoted}.to_json, false)
       }
     end
   end

@@ -79,7 +79,18 @@ class Node < ActiveRecord::Base
   def self.from_json(json, create=false)
     begin
       doc = JSON.parse(json)
-      return Node.from_json_node(doc, create)
+      
+      raise OSM::APIBadXMLError.new("node", json, "JSON must be an object.") unless doc.instance_of?(Hash)
+      raise OSM::APIBadXMLError.new("node", json, "JSON must contain a node key.") unless doc.has_key?('nodes')
+
+      nodes = doc['nodes']
+      if nodes.instance_of?(Hash)
+        return Node.from_json_node(nodes, create)
+      elsif nodes.instance_of?(Array) and nodes.length > 0
+        return Node.from_json_node(nodes[0], create)
+      else
+        raise OSM::APIBadXMLError.new("node", json, "JSON 'nodes' entry must be either an array or an object.")
+      end
 
     rescue JSON::ParserError => ex
       raise OSM::APIBadXMLError.new("node", json, ex.message)

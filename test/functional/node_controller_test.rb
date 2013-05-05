@@ -481,7 +481,7 @@ class NodeControllerTest < ActionController::TestCase
     # normal user has a changeset open, so we'll use that.
     changeset = changesets(:public_user_first_change)
     # create a minimal xml file
-    content("{\"lat\": #{lat}, \"lon\": #{lon}, \"changeset\": #{changeset.id}}")
+    content("{\"nodes\":{\"lat\": #{lat}, \"lon\": #{lon}, \"changeset\": #{changeset.id}}}")
     content_type("application/json")
     put :create
     # hope for success
@@ -509,7 +509,7 @@ class NodeControllerTest < ActionController::TestCase
     lon = 3.23
     
     # test that the upload is rejected when json is valid, but osm doc isn't
-    content("[]")
+    content("{\"nodes\":[[]]}")
     content_type("application/json")
     put :create
     assert_response :bad_request, "node upload did not return bad_request status"
@@ -517,7 +517,7 @@ class NodeControllerTest < ActionController::TestCase
 
     # test that the upload is rejected when no lat is supplied
     # create a minimal xml file
-    content({'lon'=>lon, 'changeset'=>changeset.id}.to_json)
+    content({'nodes'=>{'lon'=>lon, 'changeset'=>changeset.id}}.to_json)
     content_type("application/json")
     put :create
     # hope for success
@@ -526,7 +526,7 @@ class NodeControllerTest < ActionController::TestCase
 
     # test that the upload is rejected when no lon is supplied
     # create a minimal xml file
-    content({'lat'=>lat, 'changeset'=>changeset.id}.to_json)
+    content({'nodes'=>{'lat'=>lat, 'changeset'=>changeset.id}}.to_json)
     content_type("application/json")
     put :create
     # hope for success
@@ -534,7 +534,7 @@ class NodeControllerTest < ActionController::TestCase
     assert_equal "Cannot parse valid node from xml string {\"lat\":#{lat},\"changeset\":#{changeset.id}}. lon missing", @response.body
 
     # test that the upload is rejected when we have a tag which is too long
-    content("{\"lat\": #{lat}, \"lon\": #{lon}, \"changeset\": #{changeset.id}, \"tags\": { \"foo\": \"#{'x'*256}\" } }")
+    content("\{\"nodes\":{\"lat\": #{lat}, \"lon\": #{lon}, \"changeset\": #{changeset.id}, \"tags\": { \"foo\": \"#{'x'*256}\" } } }")
     content_type("application/json")
     put :create
     assert_response :bad_request, "node upload did not return bad_request status"
@@ -573,9 +573,9 @@ class NodeControllerTest < ActionController::TestCase
 
     # try and put something into a string that the API might 
     # use unquoted and therefore allow code injection...
-    content "{\"lat\": 0, \"lon\": 0, \"changeset\": #{changeset_id}, \"tags\": {" +
+    content "{\"nodes\":{\"lat\": 0, \"lon\": 0, \"changeset\": #{changeset_id}, \"tags\": {" +
       '"#{@user.inspect}": "0"' +
-      '} }'
+      '} } }'
     content_type("application/json")
     put :create
     assert_require_public_data "Shouldn't be able to create with non-public user"
@@ -587,9 +587,9 @@ class NodeControllerTest < ActionController::TestCase
 
     # try and put something into a string that the API might 
     # use unquoted and therefore allow code injection...
-    content "{\"lat\": 0, \"lon\": 0, \"changeset\": #{changeset_id}, \"tags\": {" +
+    content "{\"nodes\":{\"lat\": 0, \"lon\": 0, \"changeset\": #{changeset_id}, \"tags\": {" +
       '"#{@user.inspect}": "0"' +
-      '} }'
+      '} } }'
     content_type("application/json")
     put :create
     assert_response :success
