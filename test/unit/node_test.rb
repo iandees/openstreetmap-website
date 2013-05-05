@@ -262,6 +262,41 @@ class NodeTest < ActiveSupport::TestCase
     check_error_attr_new_ok(no_version, Mime::JSON, /Version is required when updating/)
   end
 
+  def test_to_json
+    node = current_nodes(:used_node_1)
+
+    data = JSON.parse(node.to_format(Mime::JSON))
+
+    assert_equal(node.id, data['nodes']['id'])
+    assert_equal(node.version, data['nodes']['version'])
+    assert_equal(node.changeset.id, data['nodes']['changeset'])
+    assert_equal(node.lat, data['nodes']['lat'])
+    assert_equal(node.lon, data['nodes']['lon'])
+    assert_equal(node.changeset.user.id, data['nodes']['uid'])
+    assert_equal(node.changeset.user.display_name, data['nodes']['user'])
+    assert_equal(node.visible, data['nodes']['visible'])
+    assert_equal(node.timestamp, Time.parse(data['nodes']['timestamp']))
+    assert_equal(node.tags, data['nodes']['tags'])
+  end
+
+  def test_to_json_respects_private_data
+    # visible_node is by a non-public user, so shouldn't show user ID or name
+    node = current_nodes(:visible_node)
+
+    data = JSON.parse(node.to_format(Mime::JSON))
+
+    assert_equal(node.id, data['nodes']['id'])
+    assert_equal(node.version, data['nodes']['version'])
+    assert_equal(node.changeset.id, data['nodes']['changeset'])
+    assert_equal(node.lat, data['nodes']['lat'])
+    assert_equal(node.lon, data['nodes']['lon'])
+    assert_equal(node.visible, data['nodes']['visible'])
+    assert_equal(node.timestamp, Time.parse(data['nodes']['timestamp']))
+    assert_equal(node.tags, data['nodes']['tags'])
+    assert_equal(false, data['nodes'].has_key?('uid'))
+    assert_equal(false, data['nodes'].has_key?('user'))
+  end
+
   ## NOTE: the "double attribute" errors which we raise in XML mode don't apply here
   ## the last value will silently overwrite any previous values. not sure if this should
   ## be considered a bug, but needs reporting in the dev docs.

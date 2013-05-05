@@ -493,13 +493,23 @@ module OSM
       doc = XML::Document.new
       doc.encoding = XML::Encoding::UTF_8
       root = XML::Node.new 'osm'
+      set_hashlike_attributes(root)
+      doc.root = root
+      return doc
+    end
+
+    def get_json_doc
+      doc = Hash.new
+      set_hashlike_attributes(doc)
+      return doc
+    end
+
+    def set_hashlike_attributes(root)
       root['version'] = API_VERSION.to_s
       root['generator'] = GENERATOR
       root['copyright'] = COPYRIGHT_OWNER
       root['attribution'] = ATTRIBUTION_URL
       root['license'] =  LICENSE_URL
-      doc.root = root
-      return doc
     end
   end
 

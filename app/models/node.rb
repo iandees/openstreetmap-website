@@ -252,6 +252,15 @@ class Node < ActiveRecord::Base
     save_with_history!
   end
 
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
+  end
+
   def to_xml
     doc = OSM::API.new.get_xml_doc
     doc.root << to_xml_node()
@@ -298,6 +307,51 @@ class Node < ActiveRecord::Base
     end
 
     el1['visible'] = self.visible.to_s
+    el1['timestamp'] = self.timestamp.xmlschema
+    return el1
+  end
+
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['nodes'] = to_osmjson_node()
+    return doc.to_json
+  end
+
+  def to_osmjson_node(changeset_cache = {}, user_display_name_cache = {})
+    el1 = Hash.new
+    el1['id'] = self.id.to_i
+    el1['version'] = self.version.to_i
+    el1['changeset'] = self.changeset_id.to_i
+
+    if self.visible?
+      el1['lat'] = self.lat.to_f
+      el1['lon'] = self.lon.to_f
+    end
+
+    if changeset_cache.key?(self.changeset_id)
+      # use the cache if available
+    else
+      changeset_cache[self.changeset_id] = self.changeset.user_id
+    end
+
+    user_id = changeset_cache[self.changeset_id]
+
+    if user_display_name_cache.key?(user_id)
+      # use the cache if available
+    elsif self.changeset.user.data_public?
+      user_display_name_cache[user_id] = self.changeset.user.display_name
+    else
+      user_display_name_cache[user_id] = nil
+    end
+
+    if not user_display_name_cache[user_id].nil?
+      el1['user'] = user_display_name_cache[user_id]
+      el1['uid'] = user_id.to_i
+    end
+
+    el1['tags'] = tags unless tags.empty?
+
+    el1['visible'] = self.visible
     el1['timestamp'] = self.timestamp.xmlschema
     return el1
   end
