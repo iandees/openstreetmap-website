@@ -81,7 +81,7 @@ class Node < ActiveRecord::Base
       doc = JSON.parse(json)
       
       raise OSM::APIBadXMLError.new("node", json, "JSON must be an object.") unless doc.instance_of?(Hash)
-      raise OSM::APIBadXMLError.new("node", json, "JSON must contain a node key.") unless doc.has_key?('nodes')
+      raise OSM::APIBadXMLError.new("node", json, "JSON must contain a 'nodes' key.") unless doc.has_key?('nodes')
 
       nodes = doc['nodes']
       if nodes.instance_of?(Hash)
