@@ -175,8 +175,8 @@ class GeocoderController < ApplicationController
       min_lat,max_lat,min_lon,max_lon = place.attributes["boundingbox"].to_s.split(",")
       prefix_name = t "geocoder.search_osm_nominatim.prefix.#{klass}.#{type}", :default => type.gsub("_", " ").capitalize
       prefix = t "geocoder.search_osm_nominatim.prefix_format", :name => prefix_name
-      object_type = place.attributes["osm_type"].to_s
-      object_id = place.attributes["osm_id"].to_s
+      object_type = place.attributes["osm_type"]
+      object_id = place.attributes["osm_id"]
 
       @results.push({:lat => lat, :lon => lon,
                      :min_lat => min_lat, :max_lat => max_lat,
@@ -344,8 +344,8 @@ private
   def nsew_to_decdeg(captures)
     begin
       Float(captures[0])
-      captures[1].downcase != 's' ? lat = captures[0].to_f : lat = -(captures[0].to_f)
-      captures[4].downcase != 'w' ? lon = captures[3].to_f : lon = -(captures[3].to_f)
+      captures[2].downcase != 's' ? lat = captures[0].to_f : lat = -(captures[0].to_f)
+      captures[5].downcase != 'w' ? lon = captures[3].to_f : lon = -(captures[3].to_f)
     rescue
       captures[0].downcase != 's' ? lat = captures[1].to_f : lat = -(captures[1].to_f)
       captures[3].downcase != 'w' ? lon = captures[4].to_f : lon = -(captures[4].to_f)
