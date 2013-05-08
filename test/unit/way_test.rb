@@ -146,6 +146,22 @@ class WayTest < ActiveSupport::TestCase
     end
   end
 
+  def test_to_json
+    way = current_ways(:visible_way)
+
+    data = JSON.parse(way.to_format(Mime::JSON))
+
+    assert_equal(way.id, data['ways']['id'])
+    assert_equal(way.version, data['ways']['version'])
+    assert_equal(way.changeset.id, data['ways']['changeset'])
+    assert_equal(way.changeset.user.id, data['ways']['uid'])
+    assert_equal(way.changeset.user.display_name, data['ways']['user'])
+    assert_equal(way.visible, data['ways']['visible'])
+    assert_equal(way.timestamp, Time.parse(data['ways']['timestamp']))
+    assert_equal(way.tags, data['ways']['tags'])
+    assert_equal(way.nds, data['ways']['nds'])
+  end
+
   #### utility methods ####
 
   # most attributes report faults in the same way, so we can abstract

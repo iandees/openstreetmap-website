@@ -157,6 +157,15 @@ class Way < ActiveRecord::Base
     #way = Way.find(id, :include => [:way_tags, {:way_nodes => :node}])
   end
 
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
+  end
+
   # Find a way given it's ID, and in a single SQL call also grab its nodes and tags
   def to_xml
     doc = OSM::API.new.get_xml_doc
@@ -223,6 +232,63 @@ class Way < ActiveRecord::Base
       e['v'] = tag.v
       el1 << e
     end
+    return el1
+  end 
+
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['ways'] = to_osmjson_node()
+    return doc.to_json
+  end
+
+  def to_osmjson_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
+    el1 = Hash.new
+    el1['id'] = self.id.to_i
+    el1['visible'] = self.visible
+    el1['timestamp'] = self.timestamp.xmlschema
+    el1['version'] = self.version.to_i
+    el1['changeset'] = self.changeset_id.to_i
+
+    if changeset_cache.key?(self.changeset_id)
+      # use the cache if available
+    else
+      changeset_cache[self.changeset_id] = self.changeset.user_id
+    end
+
+    user_id = changeset_cache[self.changeset_id]
+
+    if user_display_name_cache.key?(user_id)
+      # use the cache if available
+    elsif self.changeset.user.data_public?
+      user_display_name_cache[user_id] = self.changeset.user.display_name
+    else
+      user_display_name_cache[user_id] = nil
+    end
+
+    if not user_display_name_cache[user_id].nil?
+      el1['user'] = user_display_name_cache[user_id]
+      el1['uid'] = user_id.to_i
+    end
+
+    # make sure nodes are output in sequence_id order
+    ordered_nodes = []
+    self.way_nodes.each do |nd|
+      if visible_nodes
+        # if there is a list of visible nodes then use that to weed out deleted nodes
+        if visible_nodes[nd.node_id]
+          ordered_nodes[nd.sequence_id] = nd.node_id.to_i
+        end
+      else
+        # otherwise, manually go to the db to check things
+        if nd.node and nd.node.visible?
+          ordered_nodes[nd.sequence_id] = nd.node_id.to_i
+        end
+      end
+    end
+
+    el1['nds'] = ordered_nodes.select {|nd_id| nd_id and (nd_id != 0)}
+    el1['tags'] = tags unless tags.empty?
+
     return el1
   end 
 
