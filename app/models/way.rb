@@ -174,65 +174,7 @@ class Way < ActiveRecord::Base
   end
 
   def to_xml_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'way'
-    el1['id'] = self.id.to_s
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
-
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    # make sure nodes are output in sequence_id order
-    ordered_nodes = []
-    self.way_nodes.each do |nd|
-      if visible_nodes
-        # if there is a list of visible nodes then use that to weed out deleted nodes
-        if visible_nodes[nd.node_id]
-          ordered_nodes[nd.sequence_id] = nd.node_id.to_s
-        end
-      else
-        # otherwise, manually go to the db to check things
-        if nd.node and nd.node.visible?
-          ordered_nodes[nd.sequence_id] = nd.node_id.to_s
-        end
-      end
-    end
-
-    ordered_nodes.each do |nd_id|
-      if nd_id and nd_id != '0'
-        e = XML::Node.new 'nd'
-        e['ref'] = nd_id
-        el1 << e
-      end
-    end
-
-    self.way_tags.each do |tag|
-      e = XML::Node.new 'tag'
-      e['k'] = tag.k
-      e['v'] = tag.v
-      el1 << e
-    end
-    return el1
+    OSM::Format.way(Mime::XML, self, visible_nodes, changeset_cache, user_display_name_cache)
   end 
 
   def to_osmjson
@@ -242,54 +184,7 @@ class Way < ActiveRecord::Base
   end
 
   def to_osmjson_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
-    el1 = Hash.new
-    el1['id'] = self.id.to_i
-    el1['visible'] = self.visible
-    el1['timestamp'] = self.timestamp.xmlschema
-    el1['version'] = self.version.to_i
-    el1['changeset'] = self.changeset_id.to_i
-
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_i
-    end
-
-    # make sure nodes are output in sequence_id order
-    ordered_nodes = []
-    self.way_nodes.each do |nd|
-      if visible_nodes
-        # if there is a list of visible nodes then use that to weed out deleted nodes
-        if visible_nodes[nd.node_id]
-          ordered_nodes[nd.sequence_id] = nd.node_id.to_i
-        end
-      else
-        # otherwise, manually go to the db to check things
-        if nd.node and nd.node.visible?
-          ordered_nodes[nd.sequence_id] = nd.node_id.to_i
-        end
-      end
-    end
-
-    el1['nds'] = ordered_nodes.select {|nd_id| nd_id and (nd_id != 0)}
-    el1['tags'] = tags unless tags.empty?
-
-    return el1
+    OSM::Format.way(Mime::JSON, self, visible_nodes, changeset_cache, user_display_name_cache)
   end 
 
   def nds

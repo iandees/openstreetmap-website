@@ -268,47 +268,7 @@ class Node < ActiveRecord::Base
   end
 
   def to_xml_node(changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'node'
-    el1['id'] = self.id.to_s
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
-
-    if self.visible?
-      el1['lat'] = self.lat.to_s
-      el1['lon'] = self.lon.to_s
-    end
-
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    self.tags.each do |k,v|
-      el2 = XML::Node.new('tag')
-      el2['k'] = k.to_s
-      el2['v'] = v.to_s
-      el1 << el2
-    end
-
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    return el1
+    OSM::Format.node(Mime::XML, self, changeset_cache, user_display_name_cache)
   end
 
   def to_osmjson
@@ -318,42 +278,7 @@ class Node < ActiveRecord::Base
   end
 
   def to_osmjson_node(changeset_cache = {}, user_display_name_cache = {})
-    el1 = Hash.new
-    el1['id'] = self.id.to_i
-    el1['version'] = self.version.to_i
-    el1['changeset'] = self.changeset_id.to_i
-
-    if self.visible?
-      el1['lat'] = self.lat.to_f
-      el1['lon'] = self.lon.to_f
-    end
-
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_i
-    end
-
-    el1['tags'] = tags unless tags.empty?
-
-    el1['visible'] = self.visible
-    el1['timestamp'] = self.timestamp.xmlschema
-    return el1
+    OSM::Format.node(Mime::JSON, self, changeset_cache, user_display_name_cache)
   end
 
   def tags_as_hash
