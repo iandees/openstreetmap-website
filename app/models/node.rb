@@ -268,7 +268,7 @@ class Node < ActiveRecord::Base
   end
 
   def to_xml_node(changeset_cache = {}, user_display_name_cache = {})
-    OSM::Format.node(Mime::XML, self, changeset_cache, user_display_name_cache)
+    OSM::Format.node(Mime::XML, id, self, changeset_cache, user_display_name_cache)
   end
 
   def to_osmjson
@@ -278,7 +278,7 @@ class Node < ActiveRecord::Base
   end
 
   def to_osmjson_node(changeset_cache = {}, user_display_name_cache = {})
-    OSM::Format.node(Mime::JSON, self, changeset_cache, user_display_name_cache)
+    OSM::Format.node(Mime::JSON, id, self, changeset_cache, user_display_name_cache)
   end
 
   def tags_as_hash

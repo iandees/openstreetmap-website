@@ -174,7 +174,7 @@ class Way < ActiveRecord::Base
   end
 
   def to_xml_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
-    OSM::Format.way(Mime::XML, self, visible_nodes, changeset_cache, user_display_name_cache)
+    OSM::Format.way(Mime::XML, id, self, visible_nodes, changeset_cache, user_display_name_cache)
   end 
 
   def to_osmjson
@@ -184,7 +184,7 @@ class Way < ActiveRecord::Base
   end
 
   def to_osmjson_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
-    OSM::Format.way(Mime::JSON, self, visible_nodes, changeset_cache, user_display_name_cache)
+    OSM::Format.way(Mime::JSON, id, self, visible_nodes, changeset_cache, user_display_name_cache)
   end 
 
   def nds

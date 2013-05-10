@@ -129,8 +129,9 @@ class OldWayControllerTest < ActionController::TestCase
   def test_redact_way_moderator
     way = ways(:way_with_versions_v3)
     basic_authorization(users(:moderator_user).email, "test")
+    redaction = redactions(:example)
 
-    do_redact_way(way, redactions(:example))
+    do_redact_way(way, redaction)
     assert_response :success, "should be OK to redact old version as moderator."
 
     # check moderator can still see the redacted data, when passing
@@ -147,6 +148,7 @@ class OldWayControllerTest < ActionController::TestCase
     get :history, :id => way.way_id, :show_redactions => 'true'
     assert_response :success, "Redaction shouldn't have stopped history working."
     assert_select "osm way[id=#{way.way_id}][version=#{way.version}]", 1, "way #{way.way_id} version #{way.version} should still be present in the history for moderators when passing flag."
+    assert_select "osm way[id=#{way.way_id}][version=#{way.version}][redacted=#{redaction.id}]", 1, "way #{way.way_id} version #{way.version} should be marked as redacted (id=#{redaction.id}) in the history for moderators."
   end
 
   # testing that if the moderator drops auth, he can't see the

@@ -32,8 +32,8 @@ module OSM::Format
       end
     end
 
-    def common_attributes(obj)
-      self['id'] = obj.id
+    def common_attributes(id, obj)
+      self['id'] = id
       self['visible'] = obj.visible
       self['timestamp'] = obj.timestamp.xmlschema
       self['version'] = obj.version
@@ -46,6 +46,8 @@ module OSM::Format
         self['user'] = display_name
         self['uid'] = user_id
       end
+
+      self['redacted'] = obj.redaction.id if obj.redacted?
     end    
   end
 
@@ -113,9 +115,9 @@ module OSM::Format
     end
   end
 
-  def self.node(format, node_obj, changeset_cache = {}, user_display_name_cache = {})
+  def self.node(format, node_id, node_obj, changeset_cache = {}, user_display_name_cache = {})
     elt = OSM::Format.get_wrapper(format, 'node', changeset_cache, user_display_name_cache)
-    elt.common_attributes(node_obj)
+    elt.common_attributes(node_id, node_obj)
     if node_obj.visible?
       elt['lat'] = node_obj.lat.to_f
       elt['lon'] = node_obj.lon.to_f
@@ -124,9 +126,9 @@ module OSM::Format
     return elt.value
   end
 
-  def self.way(format, way_obj, visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
+  def self.way(format, way_id, way_obj, visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
     elt = OSM::Format.get_wrapper(format, 'way', changeset_cache, user_display_name_cache)
-    elt.common_attributes(way_obj)
+    elt.common_attributes(way_id, way_obj)
     elt.nds(way_obj.way_nodes, visible_nodes)
     elt.tags = way_obj.tags
     return elt.value

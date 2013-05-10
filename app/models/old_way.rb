@@ -93,50 +93,11 @@ class OldWay < ActiveRecord::Base
   end
 
   def to_xml_node(changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'way'
-    el1['id'] = self.way_id.to_s
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
+    OSM::Format.way(Mime::XML, way_id, self, nil, changeset_cache, user_display_name_cache)
+  end
 
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    el1['redacted'] = self.redaction.id.to_s if self.redacted?
-    
-    self.old_nodes.each do |nd| # FIXME need to make sure they come back in the right order
-      e = XML::Node.new 'nd'
-      e['ref'] = nd.node_id.to_s
-      el1 << e
-    end
-      
-    self.old_tags.each do |tag|
-      e = XML::Node.new 'tag'
-      e['k'] = tag.k
-      e['v'] = tag.v
-      el1 << e
-    end
-
-    return el1
+  def to_osmjson_node(changeset_cache = {}, user_display_name_cache = {})
+    OSM::Format.way(Mime::JSON, way_id, self, nil, changeset_cache, user_display_name_cache)
   end
 
   # Read full version of old way
