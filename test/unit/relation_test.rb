@@ -113,6 +113,21 @@ class RelationTest < ActiveSupport::TestCase
     end
   end
 
+  def test_to_json
+    rel = current_relations(:multi_tag_relation)
+    data = JSON.parse(rel.to_format(Mime::JSON))
+
+    assert_equal(rel.id, data['relations']['id'])
+    assert_equal(rel.version, data['relations']['version'])
+    assert_equal(rel.changeset.id, data['relations']['changeset'])
+    assert_equal(rel.changeset.user.id, data['relations']['uid'])
+    assert_equal(rel.changeset.user.display_name, data['relations']['user'])
+    assert_equal(rel.visible, data['relations']['visible'])
+    assert_equal(rel.timestamp, Time.parse(data['relations']['timestamp']))
+    assert_equal(rel.tags, data['relations']['tags'])
+    assert_equal(rel.members.map{|t,i,r| {'type'=>t, 'ref'=>i, 'role'=>r}}, data['relations']['members'])
+  end
+
   #### utility methods ####
 
   # most attributes report faults in the same way, so we can abstract

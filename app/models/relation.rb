@@ -174,6 +174,15 @@ class Relation < ActiveRecord::Base
     return relation
   end
 
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
+  end
+
   def to_xml
     doc = OSM::API.new.get_xml_doc
     doc.root << to_xml_node()
@@ -181,64 +190,18 @@ class Relation < ActiveRecord::Base
   end
 
   def to_xml_node(visible_members = nil, changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'relation'
-    el1['id'] = self.id.to_s
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
+    OSM::Format.relation(Mime::XML, id, self, changeset_cache, user_display_name_cache)
+  end
 
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['relations'] = to_osmjson_node()
+    return doc.to_json
+  end
 
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    self.relation_members.each do |member|
-      p=0
-      if visible_members
-        # if there is a list of visible members then use that to weed out deleted segments
-        if visible_members[member.member_type][member.member_id]
-          p=1
-        end
-      else
-        # otherwise, manually go to the db to check things
-        if member.member.visible?
-          p=1
-        end
-      end
-      if p
-        e = XML::Node.new 'member'
-        e['type'] = member.member_type.downcase
-        e['ref'] = member.member_id.to_s 
-        e['role'] = member.member_role
-        el1 << e
-       end
-    end
-
-    self.relation_tags.each do |tag|
-      e = XML::Node.new 'tag'
-      e['k'] = tag.k
-      e['v'] = tag.v
-      el1 << e
-    end
-    return el1
-  end 
+  def to_osmjson_node(visible_members = nil, changeset_cache = {}, user_display_name_cache = {})
+    OSM::Format.relation(Mime::JSON, id, self, changeset_cache, user_display_name_cache)
+  end
 
   # FIXME is this really needed?
   def members

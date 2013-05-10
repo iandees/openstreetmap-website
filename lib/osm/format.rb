@@ -77,6 +77,16 @@ module OSM::Format
         @xml << e
       end
     end
+
+    def members=(raw_members)
+      raw_members.each do |member|
+        e = XML::Node.new 'member'
+        e['type'] = member.member_type.downcase
+        e['ref'] = member.member_id.to_s 
+        e['role'] = member.member_role
+        @xml << e
+      end
+    end
     
     def value
       @xml
@@ -99,6 +109,12 @@ module OSM::Format
 
     def nds(raw_nds, visible_nodes = nil)
       @json['nds'] = Common.ordered_nodes(raw_nds, visible_nodes)
+    end
+
+    def members=(raw_members)
+      @json['members'] = raw_members.map do |m|
+        {'type' => m.member_type.downcase,' ref' => m.member_id, 'role' => m.member_role}
+      end
     end
 
     def value
@@ -131,6 +147,14 @@ module OSM::Format
     elt.common_attributes(way_id, way_obj)
     elt.nds(way_obj.way_nodes, visible_nodes)
     elt.tags = way_obj.tags
+    return elt.value
+  end
+
+  def self.relation(format, rel_id, rel_obj, changeset_cache = {}, user_display_name_cache = {})
+    elt = OSM::Format.get_wrapper(format, 'relation', changeset_cache, user_display_name_cache)
+    elt.common_attributes(rel_id, rel_obj)
+    elt.members = rel_obj.relation_members
+    elt.tags = rel_obj.tags
     return elt.value
   end
 end
