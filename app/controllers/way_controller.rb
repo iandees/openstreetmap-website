@@ -29,7 +29,7 @@ class WayController < ApplicationController
     response.last_modified = way.timestamp
     
     if way.visible
-      render :text => way.to_xml.to_s, :content_type => "text/xml"
+      render_way way
     else
       render :text => "", :status => :gone
     end
@@ -91,13 +91,8 @@ class WayController < ApplicationController
     end
 
     if ids.length > 0
-      doc = OSM::API.new.get_xml_doc
+      render_ways Way.find(ids)
 
-      Way.find(ids).each do |way|
-        doc.root << way.to_xml_node
-      end
-
-      render :text => doc.to_s, :content_type => "text/xml"
     else
       render :nothing => true, :status => :bad_request
     end
@@ -109,13 +104,28 @@ class WayController < ApplicationController
   # this seemed not to be the expected behaviour, so it was removed.
   def ways_for_node
     wayids = WayNode.where(:node_id => params[:id]).collect { |ws| ws.id[0] }.uniq
+    render_ways(Way.find(wayids).select {|w| w.visible})
+  end
 
-    doc = OSM::API.new.get_xml_doc
+private
 
-    Way.find(wayids).each do |way|
-      doc.root << way.to_xml_node if way.visible
+  def render_way(way)
+    format = request.negotiate_mime([Mime::JSON]) or Mime::XML
+    render :text => way.to_format(format).to_s, :content_type => format
+  end
+
+  def render_ways(ways)
+    if request.negotiate_mime([Mime::JSON]) == Mime::JSON
+      doc = OSM::API.new.get_json_doc
+      doc['ways'] = ways.map {|way| way.to_osmjson_node}
+      render :text => doc.to_json, :content_type => Mime::JSON
+
+    else
+      doc = OSM::API.new.get_xml_doc
+      ways.each do |way|
+        doc.root << way.to_xml_node
+      end
+      render :text => doc.to_s, :content_type => "text/xml"
     end
-
-    render :text => doc.to_s, :content_type => "text/xml"
   end
 end
