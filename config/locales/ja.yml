@@ -399,6 +399,9 @@ ja:
       user_title: "%{user} の日記"
   editor: 
     default: 既定 (現在は %{name})
+    id: 
+      description: iD (ブラウザー内エディター)
+      name: iD
     potlatch: 
       description: Potlatch 1 (ブラウザ内エディター)
       name: Potlatch 1
@@ -960,7 +963,7 @@ ja:
         opened_by: <a href='%{user_url}'>%{user}</a>が%{time}に作成
         opened_by_anonymous: 匿名ユーザーが%{time}に作成
         permalink: 固定リンク
-        reopened_by: <a href='%{user_url}'>%{user}</a> さんが %{time} に再度有効化しました
+        reopened_by: <a href='%{user_url}'>%{user}</a>が%{time}に再有効化
         reopened_by_anonymous: 匿名ユーザが %{time} に再度有効化しました
         resolve: 解決
     site: 
@@ -1007,6 +1010,7 @@ ja:
     intro_2_html: データはその%{license}のもとで自由に%{download}および%{use}できます。地図を改良するには%{create_account}してください。
     intro_2_license: オープン ライセンス
     intro_2_use: 使用
+    intro_2_use_url: http://wiki.openstreetmap.org/wiki/JA:Using_OpenStreetMap
     log_in: ログイン
     log_in_tooltip: 自分のアカウントでログイン
     logo: 
@@ -1033,6 +1037,7 @@ ja:
     welcome_user_link_tooltip: 自分のユーザー ページ
     wiki: ウィキ
     wiki_title: プロジェクトのウィキサイト
+    wiki_url: http://wiki.openstreetmap.org/wiki/JA:Main_Page
   license_page: 
     foreign: 
       english_link: 英語の原文
@@ -1128,6 +1133,13 @@ ja:
     sent_message_summary: 
       delete_button: 削除
   note: 
+    description: 
+      closed_at_by_html: "%{when}前に%{user}が解決"
+      closed_at_html: "%{when}前に解決"
+      commented_at_by_html: "%{when}前に%{user}が更新"
+      commented_at_html: "%{when}前に更新"
+      opened_at_by_html: "%{when}前に%{user}が作成"
+      opened_at_html: "%{when}前に作成"
     entry: 
       comment: コメント
       full: ノート全文
@@ -1136,17 +1148,17 @@ ja:
       created_at: 作成日時
       creator: 作成者
       description: 説明
-      heading: "%{user}のメモ"
+      heading: "%{user} のメモ"
       id: ID
       last_changed: 最終変更
       subheading: "%{user} さんが投稿またはコメントしたノート"
       title: "%{user} さんが投稿またはコメントしたノート"
     rss: 
-      closed: クローズされたノート ( %{place} 付近)
-      comment: 新しいコメント (%{place}付近)
+      closed: クローズされたノート (%{place} 付近)
+      comment: 新しいコメント (%{place} 付近)
       description_area: あなたのエリア [(%{min_lat}|%{min_lon}) -- (%{max_lat}|%{max_lon})] でレポート、コメント、あるいはクローズされたノートの一覧
       description_item: メモ %{id} の RSS フィード
-      new: 新しいメモ (%{place}付近)
+      new: 新しいメモ (%{place} 付近)
       title: OpenStreetMap メモ
   notifier: 
     diary_comment_notification: 
@@ -1163,6 +1175,7 @@ ja:
     email_confirm_plain: 
       click_the_link: この要求を出したのがあなたなら、下のリンクをクリックして、変更の認証をしてください。
       greeting: こんにちは。
+      hopefully_you: 誰か (おそらくあなた) が %{server_url} で、メール アドレスを %{new_address} に変更しようとしています。
     friend_notification: 
       befriend_them: "%{befriendurl} で友達になることができます。"
       had_added_you: OpenStreetMap で %{user} さんがあなたを友達に追加しました。
@@ -1191,6 +1204,7 @@ ja:
     lost_password_plain: 
       click_the_link: これがあなたであれば、以下のリンクをクリックしてパスワードをリセットしてください。
       greeting: こんにちは、
+      hopefully_you: 誰か (おそらくあなた) が、このメール アドレスの openstreetmap.org アカウントに対するパスワードをリセットするように依頼しました。
     message_notification: 
       footer1: "%{readurl} でメッセージを読むこともできます。"
       footer2: また、%{replyurl} で返信することができます。
@@ -1198,6 +1212,11 @@ ja:
       hi: こんにちは、%{to_user} さん。
     note_comment_notification: 
       anonymous: 匿名ユーザー
+      closed: 
+        subject_own: "[OpenStreetMap] %{commenter} さんがあなたのメモを解決しました"
+        your_note: "%{commenter} さんが %{place} 付近のあなたの地図メモの 1 つにコメントしました。"
+      commented: 
+        subject_own: "[OpenStreetMap] %{commenter} さんがあなたのメモにコメントしました"
       details: ノートについての詳細は %{url} を参照。
       greeting: こんにちは。
     signup_confirm: 
@@ -1219,7 +1238,7 @@ ja:
       introductory_video: "OpenStreetMap の紹介動画をこちらでご覧いただけます:"
       more_videos: "その他の動画がこちらにあります:"
       opengeodata: "OpenGeoData.org は OpenStreetMap の創設者 Steve Coast さんのブログであり、ポッドキャストも行なっています:"
-      the_wiki_url: http://wiki.openstreetmap.org/wiki/Ja:Beginners%27_Guide
+      the_wiki_url: http://wiki.openstreetmap.org/wiki/JA:Beginners%27_guide
       user_wiki_page: ユーザー ウィキページを作成して、あなたがどこにいるかを示すカテゴリ タグを入れることをお勧めします。例えば、[[Category:Users_in_Tokyo]] などです。
       wiki_signup: "OpenStreetMap ウィキでユーザー登録する場合は:"
       wiki_signup_url: http://wiki.openstreetmap.org/index.php?title=Special:Userlogin&type=signup&returnto=Main_Page&uselang=ja
@@ -1463,7 +1482,7 @@ ja:
       uploaded_at: "アップロード日時:"
       visibility: "可視性:"
       visibility_help: これはどういう意味?
-      visibility_help_url: http://wiki.openstreetmap.org/wiki/Ja:Visibility_of_GPS_traces
+      visibility_help_url: http://wiki.openstreetmap.org/wiki/JA:Visibility_of_GPS_traces
     list: 
       description: 最近のGPSトラックのアップロードを参照
       empty_html: ここにはまだ何もありません。<a href='%{upload_link}'>新しくトレースをアップロード</a>するか、<a href='http://wiki.openstreetmap.org/wiki/Beginners_Guide_1.2'>ウィキ ページ</a>で GPS トレースの詳細情報をお読みください。
@@ -1495,18 +1514,19 @@ ja:
     trace_form: 
       description: "説明:"
       help: ヘルプ
-      help_url: http://wiki.openstreetmap.org/wiki/Ja:Upload
+      help_url: http://wiki.openstreetmap.org/wiki/JA:Upload
       tags: "タグ:"
       tags_help: カンマ区切り
       upload_button: アップロード
       upload_gpx: "アップロードする GPX ファイル:"
       visibility: "可視性:"
       visibility_help: これはどういう意味?
-      visibility_help_url: http://wiki.openstreetmap.org/wiki/Ja:Visibility_of_GPS_traces
+      visibility_help_url: http://wiki.openstreetmap.org/wiki/JA:Visibility_of_GPS_traces
     trace_header: 
       see_all_traces: すべてのトレースを見る
       see_your_traces: 自分のトレースをすべて見る
-      traces_waiting: あなたの %{count} 件のトレースがアップロード待ち中です。これらのアップロードが完了するまでお待ちください。他のユーザーのアップロードが制限されてしまいます。
+      traces_waiting: 
+        other: あなたの %{count} 件のトレースがアップロード待ち中です。これらのアップロードが完了するまでお待ちください。他のユーザーのアップロードが制限されてしまいます。
       upload_trace: トレースをアップロード
     trace_optionals: 
       tags: タグ
@@ -1568,7 +1588,7 @@ ja:
       new image: 画像を追加
       no home location: あなたはまだ活動地域を登録していません。
       openid: 
-        link: http://wiki.openstreetmap.org/wiki/OpenID
+        link: http://wiki.openstreetmap.org/wiki/JA:OpenID
         link text: これは何ですか?
         openid: "OpenID:"
       preferred editor: "優先エディター:"
@@ -1701,6 +1721,7 @@ ja:
       password: "パスワード:"
       terms accepted: 新しい投稿規約に同意いただき、ありがとうございます!
       terms declined: 新しい投稿規約に同意いただけず残念です。詳しい情報は、<a href="%{url}">このウィキページ</a>をご覧ください。
+      terms declined url: http://wiki.openstreetmap.org/wiki/JA:Contributor_Terms_Declined
       title: アカウントの作成
       use openid: 代わりに、%{logo} OpenID を使用してログイン
     no_such_user: 
@@ -1736,6 +1757,7 @@ ja:
       consider_pd: 私の投稿をパブリック ドメインとします (著作権、著作隣接権を放棄し、著作人格権を行使しません)
       consider_pd_why: これは何ですか?
       decline: 拒否
+      declined: http://wiki.openstreetmap.org/wiki/JA:Contributor_Terms_Declined
       guidance: この規約の理解を助ける情報として、<a href="%{summary}">要約 (英語)</a> や <a href="%{translations}">非公式の翻訳</a> をご覧ください。
       heading: 投稿規約
       legale_names: 
