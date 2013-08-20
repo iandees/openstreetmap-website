@@ -4,7 +4,8 @@ class SiteController < ApplicationController
 
   before_filter :authorize_web
   before_filter :set_locale
-  before_filter :require_user, :only => [:edit]
+  before_filter :redirect_map_params, :only => [:index, :edit, :export]
+  before_filter :require_user, :only => [:edit, :welcome]
   before_filter :require_oauth, :only => [:index]
 
   def index
@@ -15,19 +16,18 @@ class SiteController < ApplicationController
 
   def permalink
     lon, lat, zoom = ShortLink::decode(params[:code])
-    new_params = params.clone
-    new_params.delete :code
+    new_params = params.except(:code, :lon, :lat, :zoom)
+
     if new_params.has_key? :m
       new_params.delete :m
       new_params[:mlat] = lat
       new_params[:mlon] = lon
-    else
-      new_params[:lat] = lat
-      new_params[:lon] = lon
     end
-    new_params[:zoom] = zoom
+
     new_params[:controller] = 'site'
     new_params[:action] = 'index'
+    new_params[:anchor] = "map=#{zoom}/#{lat}/#{lon}"
+
     redirect_to new_params
   end
 
@@ -42,6 +42,8 @@ class SiteController < ApplicationController
       render :action => :index
       return
     end
+
+    @extra_body_class = "site-edit-#{editor}"
 
     if params[:node]
       bbox = Node.find(params[:node]).bbox.to_unscaled
@@ -62,11 +64,34 @@ class SiteController < ApplicationController
     @locale = params[:copyright_locale] || I18n.locale
   end
 
+  def welcome
+  end
+
   def preview
     render :text => RichText.new(params[:format], params[:text]).to_html
   end
 
   def id
     render "id", :layout => false
+  end
+
+  private
+
+  def redirect_map_params
+    anchor = []
+
+    if params[:lat] && params[:lon]
+      anchor << "map=#{params.delete(:zoom) || 5}/#{params.delete(:lat)}/#{params.delete(:lon)}"
+    end
+
+    if params[:layers]
+      anchor << "layers=#{params.delete(:layers)}"
+    elsif params.delete(:notes) == 'yes'
+      anchor << "layers=N"
+    end
+
+    if anchor.present?
+      redirect_to params.merge(:anchor => anchor.join('&'))
+    end
   end
 end

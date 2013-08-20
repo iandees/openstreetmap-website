@@ -52,6 +52,7 @@ class User < ActiveRecord::Base
 
   after_initialize :set_defaults
   before_save :encrypt_password
+  after_save :spam_check
 
   has_attached_file :image,
     :default_url => "/assets/:class/:attachment/:style.png",
@@ -69,7 +70,14 @@ class User < ActiveRecord::Base
         end
       end
 
-      user = nil if user and user.pass_crypt != OSM::encrypt_password(options[:password], user.pass_salt)
+      if user and PasswordHash.check(user.pass_crypt, user.pass_salt, options[:password])
+        if PasswordHash.upgrade?(user.pass_crypt, user.pass_salt)
+          user.pass_crypt, user.pass_salt = PasswordHash.create(options[:password])
+          user.save
+        end
+      else
+        user = nil
+      end
     elsif options[:token]
       token = UserToken.find_by_token(options[:token])
       user = token.user if token
@@ -217,6 +225,14 @@ class User < ActiveRecord::Base
   end
 
   ##
+  # perform a spam check on a user
+  def spam_check
+    if status == "active" and spam_score > SPAM_THRESHOLD
+      update_column(:status, "suspended")
+    end
+  end
+
+  ##
   # return an oauth access token for a specified application
   def access_token(application_key)
     return ClientApplication.find_by_key(application_key).access_token_for_user(self)
@@ -231,8 +247,7 @@ private
 
   def encrypt_password
     if pass_crypt_confirmation
-      self.pass_salt = OSM::make_token(8)
-      self.pass_crypt = OSM::encrypt_password(pass_crypt, pass_salt)
+      self.pass_crypt, self.pass_salt = PasswordHash.create(pass_crypt)
       self.pass_crypt_confirmation = nil
     end
   end
