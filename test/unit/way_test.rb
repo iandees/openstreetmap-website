@@ -42,97 +42,150 @@ class WayTest < ActiveSupport::TestCase
   
   def test_from_xml_no_id
     noid = "<osm><way version='12' changeset='23' /></osm>"
-    assert_nothing_raised(OSM::APIBadXMLError) {
-      Way.from_xml(noid, true)
-    }
-    message = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(noid, false)
-    }
-    assert_match /ID is required when updating/, message.message
+    check_error_attr_new_ok(noid, Mime::XML, /ID is required when updating/)
   end
   
   def test_from_xml_no_changeset_id
     nocs = "<osm><way id='123' version='23' /></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(nocs, true)
-    }
-    assert_match /Changeset id is missing/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(nocs, false)
-    }
-    assert_match /Changeset id is missing/, message_update.message
+    check_error_attr(nocs, Mime::XML, /Changeset id is missing/)
   end
   
   def test_from_xml_no_version
     no_version = "<osm><way id='123' changeset='23' /></osm>"
-    assert_nothing_raised(OSM::APIBadXMLError) {
-      Way.from_xml(no_version, true)
-    }
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(no_version, false)
-    }
-    assert_match /Version is required when updating/, message_update.message
+    check_error_attr_new_ok(no_version, Mime::XML, /Version is required when updating/)
   end
 
   def test_from_xml_id_zero
     id_list = ["", "0", "00", "0.0", "a"]
     id_list.each do |id|
       zero_id = "<osm><way id='#{id}' changeset='33' version='23' /></osm>"
-      assert_nothing_raised(OSM::APIBadUserInput) {
-        Way.from_xml(zero_id, true)
-      }
-      message_update = assert_raise(OSM::APIBadUserInput) {
-        Way.from_xml(zero_id, false)
-      }
-      assert_match /ID of way cannot be zero when updating/, message_update.message
+      check_error_attr_new_ok(zero_id, Mime::XML, /ID of way cannot be zero when updating/, OSM::APIBadUserInput)
     end
   end
   
   def test_from_xml_no_text
-    no_text = ""
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(no_text, true)
-    }
-    assert_match /Must specify a string with one or more characters/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(no_text, false)
-    }
-    assert_match /Must specify a string with one or more characters/, message_update.message
+    check_error_attr("", Mime::XML, /Must specify a string with one or more characters/)
   end
   
   def test_from_xml_no_k_v
     nokv = "<osm><way id='23' changeset='23' version='23'><tag /></way></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(nokv, true)
-    }
-    assert_match /tag is missing key/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(nokv, false)
-    }
-    assert_match /tag is missing key/, message_update.message
+    check_error_attr(nokv, Mime::XML, /tag is missing key/)
   end
   
   def test_from_xml_no_v
     no_v = "<osm><way id='23' changeset='23' version='23'><tag k='key' /></way></osm>"
-    message_create = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(no_v, true)
-    }
-    assert_match /tag is missing value/, message_create.message
-    message_update = assert_raise(OSM::APIBadXMLError) {
-      Way.from_xml(no_v, false)
-    }
-    assert_match /tag is missing value/, message_update.message
+    check_error_attr(no_v, Mime::XML, /tag is missing value/)
   end
   
   def test_from_xml_duplicate_k
     dupk = "<osm><way id='23' changeset='23' version='23'><tag k='dup' v='test' /><tag k='dup' v='tester' /></way></osm>"
     message_create = assert_raise(OSM::APIDuplicateTagsError) {
-      Way.from_xml(dupk, true)
+      Way.from_format(Mime::XML, dupk, true)
     }
     assert_equal "Element way/ has duplicate tags with key dup", message_create.message
     message_update = assert_raise(OSM::APIDuplicateTagsError) {
-      Way.from_xml(dupk, false)
+      Way.from_format(Mime::XML, dupk, false)
     }
     assert_equal "Element way/23 has duplicate tags with key dup", message_update.message
+  end
+
+  def test_from_json_no_id
+    noid = {'ways'=>{'changeset' => 2, 'version' => 1}}.to_json
+    check_error_attr_new_ok(noid, Mime::JSON, /ID is required when updating/)
+  end
+
+  def test_from_json_no_changeset_id
+    nocs = {'ways'=>{'id' => 123, 'version' => 23}}.to_json
+    check_error_attr(nocs, Mime::JSON, /Changeset id is missing/)
+  end
+
+  def test_from_json_no_version
+    no_version = {'ways'=>{'id' => 123, 'changeset' => 23}}.to_json
+    check_error_attr_new_ok(no_version, Mime::JSON, /Version is required when updating/)
+  end
+
+  ## NOTE: the "double attribute" errors which we raise in XML mode don't apply here
+  ## the last value will silently overwrite any previous values. not sure if this should
+  ## be considered a bug, but needs reporting in the dev docs.
+
+  def test_from_json_id_zero
+    # first, testing some things which are 'zero' or otherwise invalid due to being
+    # invalid JSON
+    id_list = ["", "00", "a"]
+    id_list.each do |id|
+      zero_id = '{"ways":{"id":' + id + ',"changeset":33,"version":33}}'
+      check_error_attr(zero_id, Mime::JSON, /Cannot parse valid way from xml string/)
+    end
+
+    # second, testing some things which are also 'zero', but should be rejected at
+    # a later check due to them being 'zero'.
+    id_list = ["0", "0.0", "\"\"", "\"0\"", "\"00\"", "\"0.0\"", "\"a\""]
+    id_list.each do |id|
+      zero_id = '{"ways":{"id":' + id + ',"changeset":33,"version":33}}'
+      check_error_attr_new_ok(zero_id, Mime::JSON, /ID of way cannot be zero when updating/, OSM::APIBadUserInput)
+    end
+  end
+
+  def test_from_json_no_text
+    check_error_attr("", Mime::JSON, /A JSON text must at least contain two octets/)
+  end
+
+  # check that whether an item is in the JSON as a string or as a number
+  # doesn't make any difference to whether the way object parses.
+  def test_from_json_quoting_unimportant
+    data = {'id' => 123, 'changeset' => 23, 'version' => 23}
+    data.keys.each do |k|
+      data_quoted = data.clone
+      data_quoted[k] = data_quoted[k].to_s
+      assert_nothing_raised(OSM::APIBadUserInput) {
+        Way.from_format(Mime::JSON, {'ways'=>data_quoted}.to_json, true)
+      }
+      assert_nothing_raised(OSM::APIBadUserInput) {
+        Way.from_format(Mime::JSON, {'ways'=>data_quoted}.to_json, false)
+      }
+    end
+  end
+
+  def test_to_json
+    way = current_ways(:visible_way)
+
+    data = JSON.parse(way.to_format(Mime::JSON))
+
+    assert_equal(way.id, data['ways']['id'])
+    assert_equal(way.version, data['ways']['version'])
+    assert_equal(way.changeset.id, data['ways']['changeset'])
+    assert_equal(way.changeset.user.id, data['ways']['uid'])
+    assert_equal(way.changeset.user.display_name, data['ways']['user'])
+    assert_equal(way.visible, data['ways']['visible'])
+    assert_equal(way.timestamp, Time.parse(data['ways']['timestamp']))
+    assert_equal(way.tags, data['ways']['tags'])
+    assert_equal(way.nds, data['ways']['nds'])
+  end
+
+  #### utility methods ####
+
+  # most attributes report faults in the same way, so we can abstract
+  # that to a utility method
+  def check_error_attr(content, format, message_regex)
+    message_create = assert_raise(OSM::APIBadXMLError) {
+      Way.from_format(format, content, true)
+    }
+    assert_match message_regex, message_create.message
+    message_update = assert_raise(OSM::APIBadXMLError) {
+      Way.from_format(format, content, false)
+    }
+    assert_match message_regex, message_update.message
+  end
+
+  # some attributes are optional on newly-created elements, but required
+  # on updating elements.
+  def check_error_attr_new_ok(content, format, message_regex, exception_class=OSM::APIBadXMLError)
+    assert_nothing_raised(exception_class) {
+      Way.from_format(format, content, true)
+    }
+    message_update = assert_raise(exception_class) {
+      Way.from_format(format, content, false)
+    }
+    assert_match message_regex, message_update.message
   end
 end

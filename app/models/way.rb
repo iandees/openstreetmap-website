@@ -29,6 +29,17 @@ class Way < ActiveRecord::Base
   scope :visible, -> { where(:visible => true) }
     scope :invisible, -> { where(:visible => false) }
 
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    when Mime::JSON
+      self.from_json(data, create)
+    else
+      raise OSM::APINotAcceptable.new("way", format)
+    end
+  end
+
   # Read in xml as text and return it's Way object representation
   def self.from_xml(xml, create=false)
     begin
@@ -44,16 +55,41 @@ class Way < ActiveRecord::Base
     end
   end
 
-  def self.from_xml_node(pt, create=false)
+  # parse a JSON doc and extract the way from it
+  def self.from_json(json, create=false)
+    begin
+      doc = JSON.parse(json)
+
+      raise OSM::APIBadXMLError.new("way", json, "JSON must be an object.") unless doc.instance_of?(Hash)
+      raise OSM::APIBadXMLError.new("way", json, "JSON must contain a 'ways' key.") unless doc.has_key?('ways')
+
+      ways = doc['ways']
+      if ways.instance_of?(Hash)
+        return Way.from_json_node(ways, create)
+      elsif ways.instance_of?(Array) and ways.length > 0
+        return Way.from_json_node(ways[0], create)
+      else
+        raise OSM::APIBadXMLError.new("way", json, "JSON 'ways' entry must be either an array or an object.")
+      end
+
+    rescue JSON::ParserError => ex
+      raise OSM::APIBadXMLError.new("way", json, ex.message)
+    end
+  end
+
+  ##
+  # generate a way from a hash-like structure, i.e: duck-typed on string
+  # lookup attributes with operator[].
+  def self.from_hashlike_node(pt, create=false, &error)
     way = Way.new
 
-    raise OSM::APIBadXMLError.new("way", pt, "Version is required when updating") unless create or not pt['version'].nil?
+    error.call("way", pt, "Version is required when updating") unless create or not pt['version'].nil?
     way.version = pt['version']
-    raise OSM::APIBadXMLError.new("way", pt, "Changeset id is missing") if pt['changeset'].nil?
+    error.call("way", pt, "Changeset id is missing") if pt['changeset'].nil?
     way.changeset_id = pt['changeset']
 
     unless create
-      raise OSM::APIBadXMLError.new("way", pt, "ID is required when updating") if pt['id'].nil?
+      error.call("way", pt, "ID is required when updating") if pt['id'].nil?
       way.id = pt['id'].to_i
       # .to_i will return 0 if there is no number that can be parsed. 
       # We want to make sure that there is no id with zero anyway
@@ -67,6 +103,12 @@ class Way < ActiveRecord::Base
 
     # Start with no tags
     way.tags = Hash.new
+
+    return way
+  end
+
+  def self.from_xml_node(pt, create=false)
+    way = Way.from_hashlike_node(pt, create) {|typ, err_pt, msg| raise OSM::APIBadXMLError.new(typ, err_pt, msg) }
 
     # Add in any tags from the XML
     pt.find('tag').each do |tag|
@@ -82,14 +124,46 @@ class Way < ActiveRecord::Base
     return way
   end
 
+  # parse a way from a hash object
+  def self.from_json_node(doc, create)
+    raise OSM::APIBadXMLError.new("way", doc.to_json, "is not an object.") unless doc.instance_of? Hash
+    way = Way.from_hashlike_node(doc, create) {|typ, err_doc, msg| raise OSM::APIBadXMLError.new(typ, err_doc.to_json, msg) }
+    
+    if doc.has_key? 'tags'
+      doc_tags = doc['tags']
+      raise OSM::APIBadXMLError.new("way", doc_tags.to_json, "way/tags is not an object") unless doc_tags.instance_of? Hash
+      doc_tags.each do |k, v|
+        way.add_tag_keyval(k, v)
+      end
+    end
+
+    if doc.has_key? 'nds'
+      doc_nds = doc['nds']
+      raise OSM::APIBadXMLError.new("way", doc_nds.to_json, "way/nds is not an array") unless doc_nds.instance_of? Array
+      doc_nds.each do |nd|
+        way.add_nd_num(nd.to_i)
+      end
+    end
+
+    return way
+  end
+
   # Find a way given it's ID, and in a single SQL call also grab its nodes
   #
-  
   # You can't pull in all the tags too unless we put a sequence_id on the way_tags table and have a multipart key
   def self.find_eager(id)
     way = Way.find(id, :include => {:way_nodes => :node})
     #If waytag had a multipart key that was real, you could do this:
     #way = Way.find(id, :include => [:way_tags, {:way_nodes => :node}])
+  end
+
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
   end
 
   # Find a way given it's ID, and in a single SQL call also grab its nodes and tags
@@ -100,65 +174,17 @@ class Way < ActiveRecord::Base
   end
 
   def to_xml_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'way'
-    el1['id'] = self.id.to_s
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
+    OSM::Format.way(Mime::XML, id, self, visible_nodes, changeset_cache, user_display_name_cache)
+  end 
 
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['ways'] = to_osmjson_node()
+    return doc.to_json
+  end
 
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    # make sure nodes are output in sequence_id order
-    ordered_nodes = []
-    self.way_nodes.each do |nd|
-      if visible_nodes
-        # if there is a list of visible nodes then use that to weed out deleted nodes
-        if visible_nodes[nd.node_id]
-          ordered_nodes[nd.sequence_id] = nd.node_id.to_s
-        end
-      else
-        # otherwise, manually go to the db to check things
-        if nd.node and nd.node.visible?
-          ordered_nodes[nd.sequence_id] = nd.node_id.to_s
-        end
-      end
-    end
-
-    ordered_nodes.each do |nd_id|
-      if nd_id and nd_id != '0'
-        e = XML::Node.new 'nd'
-        e['ref'] = nd_id
-        el1 << e
-      end
-    end
-
-    self.way_tags.each do |tag|
-      e = XML::Node.new 'tag'
-      e['k'] = tag.k
-      e['v'] = tag.v
-      el1 << e
-    end
-    return el1
+  def to_osmjson_node(visible_nodes = nil, changeset_cache = {}, user_display_name_cache = {})
+    OSM::Format.way(Mime::JSON, id, self, visible_nodes, changeset_cache, user_display_name_cache)
   end 
 
   def nds

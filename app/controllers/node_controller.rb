@@ -16,9 +16,9 @@ class NodeController < ApplicationController
   def create
     assert_method :put
 
-    node = Node.from_xml(request.raw_post, true)
+    node = Node.from_format(request.content_mime_type, request.raw_post, true)
 
-    # Assume that Node.from_xml has thrown an exception if there is an error parsing the xml
+    # Assume that Node.from_format has thrown an exception if there is an error parsing the xml
     node.create_with_history @user
     render :text => node.id.to_s, :content_type => "text/plain"
   end
@@ -27,10 +27,9 @@ class NodeController < ApplicationController
   def read
     node = Node.find(params[:id])
 
-    response.last_modified = node.timestamp
-
     if node.visible
-      render :text => node.to_xml.to_s, :content_type => "text/xml"
+      response.last_modified = node.timestamp
+      render_node node
     else
       render :text => "", :status => :gone
     end
@@ -39,7 +38,7 @@ class NodeController < ApplicationController
   # Update a node from given XML
   def update
     node = Node.find(params[:id])
-    new_node = Node.from_xml(request.raw_post)
+    new_node = Node.from_format(request.content_mime_type, request.raw_post)
        
     unless new_node and new_node.id == node.id
       raise OSM::APIBadUserInput.new("The id in the url (#{node.id}) is not the same as provided in the xml (#{new_node.id})")
@@ -53,7 +52,7 @@ class NodeController < ApplicationController
   # method returns the new version number.
   def delete
     node = Node.find(params[:id])
-    new_node = Node.from_xml(request.raw_post)
+    new_node = Node.from_format(request.content_mime_type, request.raw_post)
     
     unless new_node and new_node.id == node.id
       raise OSM::APIBadUserInput.new("The id in the url (#{node.id}) is not the same as provided in the xml (#{new_node.id})")
@@ -73,12 +72,29 @@ class NodeController < ApplicationController
     if ids.length == 0
       raise OSM::APIBadUserInput.new("No nodes were given to search for")
     end
-    doc = OSM::API.new.get_xml_doc
 
-    Node.find(ids).each do |node|
-      doc.root << node.to_xml_node
+    render_nodes Node.find(ids)
+  end
+
+private
+
+  def render_node(node)
+    format = request.negotiate_mime([Mime::JSON]) or Mime::XML
+    render :text => node.to_format(format).to_s, :content_type => format
+  end
+
+  def render_nodes(nodes)
+    if request.negotiate_mime([Mime::JSON]) == Mime::JSON
+      doc = OSM::API.new.get_json_doc
+      doc['nodes'] = nodes.map {|node| node.to_osmjson_node}
+      render :text => doc.to_json, :content_type => Mime::JSON
+
+    else
+      doc = OSM::API.new.get_xml_doc
+      nodes.each do |node|
+        doc.root << node.to_xml_node
+      end
+      render :text => doc.to_s, :content_type => "text/xml"
     end
-
-    render :text => doc.to_s, :content_type => "text/xml"
   end
 end

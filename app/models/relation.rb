@@ -32,6 +32,17 @@ class Relation < ActiveRecord::Base
 
   TYPES = ["node", "way", "relation"]
 
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    when Mime::JSON
+      self.from_json(data, create)
+    else
+      raise OSM::APINotAcceptable.new("relation", format)
+    end
+  end
+
   def self.from_xml(xml, create=false)
     begin
       p = XML::Parser.string(xml)
@@ -46,16 +57,41 @@ class Relation < ActiveRecord::Base
     end
   end
 
-  def self.from_xml_node(pt, create=false)
+  # parse a JSON doc and extract the relation from it
+  def self.from_json(json, create=false)
+    begin
+      doc = JSON.parse(json)
+
+      raise OSM::APIBadXMLError.new("relation", json, "JSON must be an object.") unless doc.instance_of?(Hash)
+      raise OSM::APIBadXMLError.new("relation", json, "JSON must contain a 'relations' key.") unless doc.has_key?('relations')
+
+      relations = doc['relations']
+      if relations.instance_of?(Hash)
+        return Relation.from_json_node(relations, create)
+      elsif relations.instance_of?(Array) and relations.length > 0
+        return Relation.from_json_node(relations[0], create)
+      else
+        raise OSM::APIBadXMLError.new("relation", json, "JSON 'relations' entry must be either an array or an object.")
+      end
+
+    rescue JSON::ParserError => ex
+      raise OSM::APIBadXMLError.new("relation", json, ex.message)
+    end
+  end
+
+  ##
+  # generate a relation from a hash-like structure, i.e: duck-typed on string
+  # lookup attributes with operator[].
+  def self.from_hashlike_node(pt, create=false, &error)
     relation = Relation.new
 
-    raise OSM::APIBadXMLError.new("relation", pt, "Version is required when updating") unless create or not pt['version'].nil?
+    error.call("relation", pt, "Version is required when updating") unless create or not pt['version'].nil?
     relation.version = pt['version']
-    raise OSM::APIBadXMLError.new("relation", pt, "Changeset id is missing") if pt['changeset'].nil?
+    error.call("relation", pt, "Changeset id is missing") if pt['changeset'].nil?
     relation.changeset_id = pt['changeset']
     
     unless create
-      raise OSM::APIBadXMLError.new("relation", pt, "ID is required when updating") if pt['id'].nil?
+      error.call("relation", pt, "ID is required when updating") if pt['id'].nil?
       relation.id = pt['id'].to_i
       # .to_i will return 0 if there is no number that can be parsed. 
       # We want to make sure that there is no id with zero anyway
@@ -69,6 +105,12 @@ class Relation < ActiveRecord::Base
 
     # Start with no tags
     relation.tags = Hash.new
+
+    return relation
+  end
+
+  def self.from_xml_node(pt, create=false)
+    relation = Relation.from_hashlike_node(pt, create) {|typ, err_pt, msg| raise OSM::APIBadXMLError.new(typ, err_pt, msg) }
 
     # Add in any tags from the XML
     pt.find('tag').each do |tag|
@@ -84,19 +126,61 @@ class Relation < ActiveRecord::Base
     relation.members = Array.new
 
     pt.find('member').each do |member|
-      #member_type = 
-      logger.debug "each member"
       raise OSM::APIBadXMLError.new("relation", pt, "The #{member['type']} is not allowed only, #{TYPES.inspect} allowed") unless TYPES.include? member['type']
-      logger.debug "after raise"
-      #member_ref = member['ref']
-      #member_role
       member['role'] ||= "" # Allow  the upload to not include this, in which case we default to an empty string.
-      logger.debug member['role']
       relation.add_member(member['type'].classify, member['ref'], member['role'])
     end
-    raise OSM::APIBadUserInput.new("Some bad xml in relation") if relation.nil?
 
     return relation
+  end
+
+  def self.from_json_node(doc, create=false)
+    raise OSM::APIBadXMLError.new("relation", doc.to_json, "is not an object.") unless doc.instance_of? Hash
+    relation = Relation.from_hashlike_node(doc, create) {|typ, err_doc, msg| raise OSM::APIBadXMLError.new(typ, err_doc.to_json, msg) }
+
+    # Add in any tags from the JSON
+    if doc.has_key? 'tags'
+      doc_tags = doc['tags']
+      raise OSM::APIBadXMLError.new("relation", doc_tags.to_json, "relation/tags is not an object") unless doc_tags.instance_of? Hash
+      doc_tags.each do |k, v|
+        relation.add_tag_keyval(k, v)
+      end
+    end
+
+    # need to initialise the relation members array explicitly, as if this
+    # isn't done for a new relation then @members attribute will be nil, 
+    # and the members will be loaded from the database instead of being 
+    # empty, as intended.
+    relation.members = Array.new
+
+    if doc.has_key? 'members'
+      doc_members = doc['members']
+      if doc_members.instance_of?(Hash)
+        doc_members = [doc_members]
+      else
+        raise OSM::APIBadXMLError.new("relation", doc_members.to_json, "relation/members is not an array or object") unless doc_members.instance_of? Array
+      end
+      doc_members.each do |member|
+        raise OSM::APIBadXMLError.new("relation", member.to_json, "relation/member is not an object") unless member.instance_of? Hash
+        ['type', 'ref'].each do |required_key|
+          raise OSM::APIBadXMLError.new("relation", member.to_json, "key #{required_key.inspect} is required in relation/member object") unless member.has_key?(required_key)
+        end
+        raise OSM::APIBadXMLError.new("relation", member.to_json, "The type #{member['type']} is not allowed, only #{TYPES.inspect} allowed") unless TYPES.include? member['type']
+        member['role'] ||= "" # Allow  the upload to not include this, in which case we default to an empty string.
+        relation.add_member(member['type'].classify, member['ref'], member['role'].to_s)
+      end
+    end
+
+    return relation
+  end
+
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
   end
 
   def to_xml
@@ -106,64 +190,18 @@ class Relation < ActiveRecord::Base
   end
 
   def to_xml_node(visible_members = nil, changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'relation'
-    el1['id'] = self.id.to_s
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
+    OSM::Format.relation(Mime::XML, id, self, changeset_cache, user_display_name_cache)
+  end
 
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['relations'] = to_osmjson_node()
+    return doc.to_json
+  end
 
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    self.relation_members.each do |member|
-      p=0
-      if visible_members
-        # if there is a list of visible members then use that to weed out deleted segments
-        if visible_members[member.member_type][member.member_id]
-          p=1
-        end
-      else
-        # otherwise, manually go to the db to check things
-        if member.member.visible?
-          p=1
-        end
-      end
-      if p
-        e = XML::Node.new 'member'
-        e['type'] = member.member_type.downcase
-        e['ref'] = member.member_id.to_s 
-        e['role'] = member.member_role
-        el1 << e
-       end
-    end
-
-    self.relation_tags.each do |tag|
-      e = XML::Node.new 'tag'
-      e['k'] = tag.k
-      e['v'] = tag.v
-      el1 << e
-    end
-    return el1
-  end 
+  def to_osmjson_node(visible_members = nil, changeset_cache = {}, user_display_name_cache = {})
+    OSM::Format.relation(Mime::JSON, id, self, changeset_cache, user_display_name_cache)
+  end
 
   # FIXME is this really needed?
   def members

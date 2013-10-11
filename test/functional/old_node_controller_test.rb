@@ -239,8 +239,9 @@ class OldNodeControllerTest < ActionController::TestCase
   def test_redact_node_moderator
     node = nodes(:node_with_versions_v3)
     basic_authorization(users(:moderator_user).email, "test")
+    redaction = redactions(:example)
 
-    do_redact_node(node, redactions(:example))
+    do_redact_node(node, redaction)
     assert_response :success, "should be OK to redact old version as moderator."
 
     # check moderator can still see the redacted data, when passing
@@ -257,6 +258,7 @@ class OldNodeControllerTest < ActionController::TestCase
     get :history, :id => node.node_id, :show_redactions => 'true'
     assert_response :success, "Redaction shouldn't have stopped history working."
     assert_select "osm node[id=#{node.node_id}][version=#{node.version}]", 1, "node #{node.node_id} version #{node.version} should still be present in the history for moderators when passing flag."
+    assert_select "osm node[id=#{node.node_id}][version=#{node.version}][redacted=#{redaction.id}]", 1, "node #{node.node_id} version #{node.version} should be marked as redacted (id=#{redaction.id}) in the history for moderators."
   end
 
   # testing that if the moderator drops auth, he can't see the

@@ -1808,6 +1808,36 @@ EOF
     assert_select "osmChange node[id=17][version=1]", 0
   end
 
+  def test_create_json
+    basic_authorization users(:normal_user).email, "test"
+    # Create the first user's changeset
+    content({'changesets'=>{'tags'=>{'created_by'=>'osm test suite checking changesets'}}}.to_json)
+    content_type('application/json')
+    put :create
+    assert_require_public_data
+    
+    basic_authorization users(:public_user).email, "test"
+    # Create the first user's changeset
+    content({'changesets'=>{'tags'=>{'created_by'=>'osm test suite checking changesets'}}}.to_json)
+    content_type('application/json')
+    put :create
+
+    assert_response :success, "Creation of changeset did not return sucess status"
+    newid = @response.body.to_i
+
+    # check end time, should be an hour ahead of creation time
+    cs = Changeset.find(newid)
+    duration = cs.closed_at - cs.created_at
+    # the difference can either be a rational, or a floating point number
+    # of seconds, depending on the code path taken :-(
+    if duration.class == Rational
+      assert_equal Rational(1,24), duration , "initial idle timeout should be an hour (#{cs.created_at} -> #{cs.closed_at})"
+    else
+      # must be number of seconds...
+      assert_equal 3600, duration.round, "initial idle timeout should be an hour (#{cs.created_at} -> #{cs.closed_at})"
+    end
+  end
+
   #------------------------------------------------------------
   # utility functions
   #------------------------------------------------------------
@@ -1855,4 +1885,8 @@ EOF
     return xml
   end
 
+  # set content type for this request
+  def content_type(t)
+    @request.env["CONTENT_TYPE"] = t.to_s
+  end
 end

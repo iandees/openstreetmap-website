@@ -36,6 +36,15 @@ class OldNode < ActiveRecord::Base
     return old_node
   end
   
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
+  end
+
   def to_xml
     doc = OSM::API.new.get_xml_doc
     doc.root << to_xml_node()
@@ -43,50 +52,17 @@ class OldNode < ActiveRecord::Base
   end
 
   def to_xml_node(changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'node'
-    el1['id'] = self.node_id.to_s
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
+    OSM::Format.node(Mime::XML, node_id, self, changeset_cache, user_display_name_cache)
+  end
 
-    if self.visible?
-      el1['lat'] = self.lat.to_s
-      el1['lon'] = self.lon.to_s
-    end
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['nodes'] = to_osmjson_node()
+    return doc.to_json
+  end
 
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    self.tags.each do |k,v|
-      el2 = XML::Node.new('tag')
-      el2['k'] = k.to_s
-      el2['v'] = v.to_s
-      el1 << el2
-    end
-
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    
-    el1['redacted'] = self.redaction.id.to_s if self.redacted?
-
-    return el1
+  def to_osmjson_node(changeset_cache = {}, user_display_name_cache = {})
+    OSM::Format.node(Mime::JSON, node_id, self, changeset_cache, user_display_name_cache)
   end
 
   def save_with_dependencies!

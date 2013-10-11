@@ -13,7 +13,7 @@ class RelationController < ApplicationController
   def create
     assert_method :put
 
-    relation = Relation.from_xml(request.raw_post, true)
+    relation = Relation.from_format(request.content_mime_type, request.raw_post, true)
     
     # We assume that an exception has been thrown if there was an error 
     # generating the relation
@@ -39,7 +39,7 @@ class RelationController < ApplicationController
     logger.debug request.raw_post
 
     relation = Relation.find(params[:id])
-    new_relation = Relation.from_xml(request.raw_post)
+    new_relation = Relation.from_format(request.content_mime_type, request.raw_post)
     
     if new_relation and new_relation.id == relation.id
       relation.update_from new_relation, @user
@@ -51,7 +51,7 @@ class RelationController < ApplicationController
 
   def delete
     relation = Relation.find(params[:id])
-    new_relation = Relation.from_xml(request.raw_post)
+    new_relation = Relation.from_format(request.content_mime_type, request.raw_post)
     if new_relation and new_relation.id == relation.id
       relation.delete_with_history!(new_relation, @user)
       render :text => relation.version.to_s, :content_type => "text/plain"

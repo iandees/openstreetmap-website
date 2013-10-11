@@ -52,6 +52,17 @@ class Changeset < ActiveRecord::Base
     end
   end
 
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    when Mime::JSON
+      self.from_json(data, create)
+    else
+      raise OSM::APINotAcceptable.new("changeset", format)
+    end
+  end
+
   def self.from_xml(xml, create=false)
     begin
       p = XML::Parser.string(xml, :options => XML::Parser::Options::NOERROR)
@@ -66,8 +77,20 @@ class Changeset < ActiveRecord::Base
     end
   end
 
-  def self.from_xml_node(pt, create=false)
+  # parse a JSON doc and extract the node from it
+  def self.from_json(json, create=false)
+    begin
+      doc = JSON.parse(json)
+      return Changeset.from_json_node(doc, create)
+
+    rescue JSON::ParserError => ex
+      raise OSM::APIBadXMLError.new("changeset", json, ex.message)
+    end
+  end
+
+  def self.new_blank(create=false)
     cs = Changeset.new
+
     if create
       cs.created_at = Time.now.getutc
       # initial close time is 1h ahead, but will be increased on each
@@ -77,10 +100,33 @@ class Changeset < ActiveRecord::Base
       cs.num_changes = 0
     end
 
+    return cs
+  end
+
+  def self.from_xml_node(pt, create=false)
+    cs = Changeset.new_blank(create)
+
     pt.find('tag').each do |tag|
       raise OSM::APIBadXMLError.new("changeset", pt, "tag is missing key") if tag['k'].nil?
       raise OSM::APIBadXMLError.new("changeset", pt, "tag is missing value") if tag['v'].nil?
       cs.add_tag_keyval(tag['k'], tag['v'])
+    end
+
+    return cs
+  end
+
+  # parse node from a hash object
+  def self.from_json_node(doc, create)
+    raise OSM::APIBadXMLError.new("changeset", doc.to_json, "is not an object.") unless doc.instance_of? Hash
+
+    cs = Changeset.new_blank(create)
+
+    if doc.has_key? 'tags'
+      doc_tags = doc['tags']
+      raise OSM::APIBadXMLError.new("changeset", doc_tags.to_json, "changeset/tags is not an object") unless doc_tags.instance_of? Hash
+      doc_tags.each do |k, v|
+        cs.add_tag_keyval(k, v)
+      end
     end
 
     return cs

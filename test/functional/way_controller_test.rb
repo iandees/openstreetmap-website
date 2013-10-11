@@ -521,6 +521,158 @@ class WayControllerTest < ActionController::TestCase
     end
   end
 
+  # -------------------------------------
+  # Test simple way creation in JSON.
+  # -------------------------------------
+
+  def test_create_json
+    nid1 = current_nodes(:used_node_1).id
+    nid2 = current_nodes(:used_node_2).id
+    basic_authorization users(:public_user).email, "test"
+
+    # use the first user's open changeset
+    changeset_id = changesets(:public_user_first_change).id
+    
+    # create a way with pre-existing nodes
+    content({'ways'=>{'changeset'=>changeset_id, 'nds'=>[nid1, nid2], 'tags'=>{'test'=>'yes'}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # hope for success
+    assert_response(:success, "way upload did not return success status: #{@response.body}")
+
+    # read id of created way and search for it
+    wayid = @response.body.to_i
+    checkway = Way.find(wayid)
+    assert_not_nil checkway, 
+        "uploaded way not found in data base after upload"
+    # compare values
+    assert_equal checkway.nds.length, 2, 
+        "saved way does not contain exactly one node"
+    assert_equal checkway.nds[0], nid1, 
+        "saved way does not contain the right node on pos 0"
+    assert_equal checkway.nds[1], nid2, 
+        "saved way does not contain the right node on pos 1"
+    assert_equal checkway.changeset_id, changeset_id,
+        "saved way does not belong to the correct changeset"
+    assert_equal users(:public_user).id, checkway.changeset.user_id, 
+        "saved way does not belong to user that created it"
+    assert_equal true, checkway.visible, 
+        "saved way is not visible"
+    assert_equal checkway.tags, {'test'=>'yes'},
+        "saved way doesn't have the tags which were uploaded."
+  end
+
+  # -------------------------------------
+  # Test creating some invalid ways in JSON.
+  # -------------------------------------
+
+  def test_create_invalid_json
+    basic_authorization users(:public_user).email, "test"
+
+    # use the first user's open changeset
+    open_changeset_id = changesets(:public_user_first_change).id
+    closed_changeset_id = changesets(:public_user_closed_change).id
+    nid1 = current_nodes(:used_node_1).id
+
+    # create a way with non-existing node
+    content({'ways'=>{'changeset'=>open_changeset_id, 'nds'=>[0], 'tags'=>{'test'=>'yes'}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # expect failure
+    assert_response(:precondition_failed, 
+        "way upload with invalid node did not return 'precondition failed': #{@response.body}")
+    assert_equal "Precondition failed: Way  requires the nodes with id in (0), which either do not exist, or are not visible.", @response.body
+
+    # create a way with no nodes
+    [{}, {'nds'=>[]}].each do |nds|
+      content({'ways'=>{'changeset'=>open_changeset_id, 'tags'=>{'test'=>'yes'}}.merge(nds)}.to_json)
+      content_type 'application/json'
+      put :create
+      # expect failure
+      assert_response :precondition_failed, 
+          "way upload with no node did not return 'precondition failed'"
+      assert_equal "Precondition failed: Cannot create way: data is invalid.", @response.body
+    end
+
+    # create a way inside a closed changeset
+    content({'ways'=>{'changeset'=>closed_changeset_id, 'nds'=>[nid1]}}.to_json)
+    content_type 'application/json'
+    put :create
+    # expect failure
+    assert_response :conflict, 
+        "way upload to closed changeset did not return 'conflict'"    
+
+    # create a way with a tag which is too long
+    content({'ways'=>{'changeset'=>open_changeset_id, 'nds'=>[nid1], 'tags'=>{'test'=>('x'*256)}}}.to_json)
+    content_type 'application/json'
+    put :create
+    # expect failure
+    assert_response :bad_request, 
+        "way upload to with too long tag did not return 'bad_request'"
+  end
+
+  # -------------------------------------
+  # Test deleting ways in JSON.
+  # -------------------------------------
+  
+  def test_delete_json
+    # set auth
+    basic_authorization(users(:public_user).email, "test");  
+
+    # this shouldn't work as with the 0.6 api we need pay load to delete
+    delete :delete, :id => current_ways(:visible_way).id
+    assert_response :bad_request
+    
+    # Now try without having a changeset
+    content({'ways'=>{'id'=>current_ways(:visible_way).id}})
+    content_type 'application/json'
+    delete :delete, :id => current_ways(:visible_way).id
+    assert_response :bad_request
+
+    # TODO: need to_json for these...
+    # # try to delete with an invalid (closed) changeset
+    # content update_changeset(current_ways(:visible_way).to_xml,
+    #                          changesets(:public_user_closed_change).id)
+    # delete :delete, :id => current_ways(:visible_way).id
+    # assert_response :conflict
+
+    # # try to delete with an invalid (non-existent) changeset
+    # content update_changeset(current_ways(:visible_way).to_xml,0)
+    # delete :delete, :id => current_ways(:visible_way).id
+    # assert_response :conflict
+
+    # # Now try with a valid changeset
+    # content current_ways(:visible_way).to_xml
+    # delete :delete, :id => current_ways(:visible_way).id
+    # assert_response :success
+
+    # # check the returned value - should be the new version number
+    # # valid delete should return the new version number, which should
+    # # be greater than the old version number
+    # assert @response.body.to_i > current_ways(:visible_way).version,
+    #    "delete request should return a new version number for way"
+
+    # # this won't work since the way is already deleted
+    # content current_ways(:invisible_way).to_xml
+    # delete :delete, :id => current_ways(:invisible_way).id
+    # assert_response :gone
+
+    # # this shouldn't work as the way is used in a relation
+    # content current_ways(:used_way).to_xml
+    # delete :delete, :id => current_ways(:used_way).id
+    # assert_response :precondition_failed, 
+    #    "shouldn't be able to delete a way used in a relation (#{@response.body})"
+    # assert_equal "Precondition failed: Way 3 is still used by relations 1.", @response.body
+
+    # # this won't work since the way never existed
+    # delete :delete, :id => 0
+    # assert_response :not_found
+  end
+
+  # --------------------------------------------------------
+  # utility functions
+  # --------------------------------------------------------
+
   ##
   # update the changeset_id of a node element
   def update_changeset(xml, changeset_id)
@@ -532,5 +684,9 @@ class WayControllerTest < ActionController::TestCase
   def xml_attr_rewrite(xml, name, value)
     xml.find("//osm/way").first[name] = value.to_s
     return xml
+  end
+
+  def content_type(t)
+    @request.env["CONTENT_TYPE"] = t.to_s
   end
 end

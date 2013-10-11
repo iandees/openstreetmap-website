@@ -280,6 +280,24 @@ module OSM
     end
   end
 
+  ##
+  # raised when the API encounters a content-type which it
+  # is unable to handle.
+  class APINotAcceptable < APIError
+    def initialize(type, mime)
+      @type = type
+      @mime = mime
+    end
+
+    def status
+      :not_acceptable
+    end
+
+    def to_s
+      "Cannot accept requests with content type #{@mime.inspect} when parsing #{@type}."
+    end
+  end
+
   # Raised when the note provided is already closed
   class APINoteAlreadyClosedError < APIError
     def initialize(note)
@@ -422,13 +440,23 @@ module OSM
       doc = XML::Document.new
       doc.encoding = XML::Encoding::UTF_8
       root = XML::Node.new 'osm'
+      set_hashlike_attributes(root)
+      doc.root = root
+      return doc
+    end
+
+    def get_json_doc
+      doc = Hash.new
+      set_hashlike_attributes(doc)
+      return doc
+    end
+
+    def set_hashlike_attributes(root)
       root['version'] = API_VERSION.to_s
       root['generator'] = GENERATOR
       root['copyright'] = COPYRIGHT_OWNER
       root['attribution'] = ATTRIBUTION_URL
       root['license'] =  LICENSE_URL
-      doc.root = root
-      return doc
     end
   end
 

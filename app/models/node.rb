@@ -63,6 +63,40 @@ class Node < ActiveRecord::Base
                        :limit => MAX_NUMBER_OF_NODES+1)
   end
 
+  # parse a node from some string data and a format
+  def self.from_format(format, data, create=false)
+    case format
+    when Mime::XML, nil
+      self.from_xml(data, create)
+    when Mime::JSON
+      self.from_json(data, create)
+    else
+      raise OSM::APINotAcceptable.new("node", format)
+    end
+  end
+
+  # parse a JSON doc and extract the node from it
+  def self.from_json(json, create=false)
+    begin
+      doc = JSON.parse(json)
+      
+      raise OSM::APIBadXMLError.new("node", json, "JSON must be an object.") unless doc.instance_of?(Hash)
+      raise OSM::APIBadXMLError.new("node", json, "JSON must contain a 'nodes' key.") unless doc.has_key?('nodes')
+
+      nodes = doc['nodes']
+      if nodes.instance_of?(Hash)
+        return Node.from_json_node(nodes, create)
+      elsif nodes.instance_of?(Array) and nodes.length > 0
+        return Node.from_json_node(nodes[0], create)
+      else
+        raise OSM::APIBadXMLError.new("node", json, "JSON 'nodes' entry must be either an array or an object.")
+      end
+
+    rescue JSON::ParserError => ex
+      raise OSM::APIBadXMLError.new("node", json, ex.message)
+    end
+  end
+
   # Read in xml as text and return it's Node object representation
   def self.from_xml(xml, create=false)
     begin
@@ -78,7 +112,10 @@ class Node < ActiveRecord::Base
     end
   end
 
-  def self.from_xml_node(pt, create=false)
+  ##
+  # generate a node from a hash-like structure, i.e: duck-typed on string
+  # lookup attributes with operator[].
+  def self.from_hashlike_node(pt, create=false, &error)
     node = Node.new
     
     raise OSM::APIBadXMLError.new("node", pt, "lat missing") if pt['lat'].nil?
@@ -91,11 +128,11 @@ class Node < ActiveRecord::Base
     raise OSM::APIBadUserInput.new("The node is outside this world") unless node.in_world?
 
     # version must be present unless creating
-    raise OSM::APIBadXMLError.new("node", pt, "Version is required when updating") unless create or not pt['version'].nil?
+    error.call("node", pt, "Version is required when updating") unless create or not pt['version'].nil?
     node.version = create ? 0 : pt['version'].to_i
 
     unless create
-      raise OSM::APIBadXMLError.new("node", pt, "ID is required when updating.") if pt['id'].nil?
+      error.call("node", pt, "ID is required when updating.") if pt['id'].nil?
       node.id = pt['id'].to_i
       # .to_i will return 0 if there is no number that can be parsed. 
       # We want to make sure that there is no id with zero anyway
@@ -110,11 +147,34 @@ class Node < ActiveRecord::Base
     # Start with no tags
     node.tags = Hash.new
 
+    return node
+  end
+
+  # parse node from an in-memory libxml DOM object
+  def self.from_xml_node(pt, create=false)
+    node = Node.from_hashlike_node(pt, create) {|typ, err_pt, msg| raise OSM::APIBadXMLError.new(typ, err_pt, msg) }
+
     # Add in any tags from the XML
     pt.find('tag').each do |tag|
       raise OSM::APIBadXMLError.new("node", pt, "tag is missing key") if tag['k'].nil?
       raise OSM::APIBadXMLError.new("node", pt, "tag is missing value") if tag['v'].nil?
       node.add_tag_key_val(tag['k'],tag['v'])
+    end
+
+    return node
+  end
+
+  # parse node from a hash object
+  def self.from_json_node(doc, create)
+    raise OSM::APIBadXMLError.new("node", doc.to_json, "is not an object.") unless doc.instance_of? Hash
+    node = Node.from_hashlike_node(doc, create) {|typ, err_doc, msg| raise OSM::APIBadXMLError.new(typ, err_doc.to_json, msg) }
+
+    if doc.has_key? 'tags'
+      doc_tags = doc['tags']
+      raise OSM::APIBadXMLError.new("node", doc_tags.to_json, "node/tags is not an object") unless doc_tags.instance_of? Hash
+      doc_tags.each do |k, v|
+        node.add_tag_key_val(k, v)
+      end
     end
 
     return node
@@ -192,6 +252,15 @@ class Node < ActiveRecord::Base
     save_with_history!
   end
 
+  def to_format(format)
+    case format
+    when Mime::JSON
+      to_osmjson
+    else
+      to_xml
+    end
+  end
+
   def to_xml
     doc = OSM::API.new.get_xml_doc
     doc.root << to_xml_node()
@@ -199,47 +268,17 @@ class Node < ActiveRecord::Base
   end
 
   def to_xml_node(changeset_cache = {}, user_display_name_cache = {})
-    el1 = XML::Node.new 'node'
-    el1['id'] = self.id.to_s
-    el1['version'] = self.version.to_s
-    el1['changeset'] = self.changeset_id.to_s
+    OSM::Format.node(Mime::XML, id, self, changeset_cache, user_display_name_cache)
+  end
 
-    if self.visible?
-      el1['lat'] = self.lat.to_s
-      el1['lon'] = self.lon.to_s
-    end
+  def to_osmjson
+    doc = OSM::API.new.get_json_doc
+    doc['nodes'] = to_osmjson_node()
+    return doc.to_json
+  end
 
-    if changeset_cache.key?(self.changeset_id)
-      # use the cache if available
-    else
-      changeset_cache[self.changeset_id] = self.changeset.user_id
-    end
-
-    user_id = changeset_cache[self.changeset_id]
-
-    if user_display_name_cache.key?(user_id)
-      # use the cache if available
-    elsif self.changeset.user.data_public?
-      user_display_name_cache[user_id] = self.changeset.user.display_name
-    else
-      user_display_name_cache[user_id] = nil
-    end
-
-    if not user_display_name_cache[user_id].nil?
-      el1['user'] = user_display_name_cache[user_id]
-      el1['uid'] = user_id.to_s
-    end
-
-    self.tags.each do |k,v|
-      el2 = XML::Node.new('tag')
-      el2['k'] = k.to_s
-      el2['v'] = v.to_s
-      el1 << el2
-    end
-
-    el1['visible'] = self.visible.to_s
-    el1['timestamp'] = self.timestamp.xmlschema
-    return el1
+  def to_osmjson_node(changeset_cache = {}, user_display_name_cache = {})
+    OSM::Format.node(Mime::JSON, id, self, changeset_cache, user_display_name_cache)
   end
 
   def tags_as_hash
