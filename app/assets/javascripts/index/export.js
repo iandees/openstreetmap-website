@@ -41,11 +41,14 @@ OSM.Export = function(map) {
     $("#minlat").val(bounds.getSouth().toFixed(precision));
     $("#maxlon").val(bounds.getEast().toFixed(precision));
     $("#maxlat").val(bounds.getNorth().toFixed(precision));
+
+    document.getElementById("overpass-export").href = "http://overpass-api.de/api/map?bbox="
+        + $("#minlon").val() + "," + $("#minlat").val() + "," + $("#maxlon").val() + "," + $("#maxlat").val();
   }
 
   function validateControls() {
     $("#export_osm_too_large").toggle(getBounds().getSize() > OSM.MAX_REQUEST_AREA);
-    $("#export_commit").toggle(getBounds().getSize() < OSM.MAX_REQUEST_AREA);
+    $("#small_export_view").toggle(getBounds().getSize() < OSM.MAX_REQUEST_AREA);
   }
 
   page.pushstate = page.popstate = function(path) {
