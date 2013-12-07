@@ -42,8 +42,9 @@ OSM.Export = function(map) {
     $("#maxlon").val(bounds.getEast().toFixed(precision));
     $("#maxlat").val(bounds.getNorth().toFixed(precision));
 
-    document.getElementById("overpass-export").href = "http://overpass-api.de/api/map?bbox="
-        + $("#minlon").val() + "," + $("#minlat").val() + "," + $("#maxlon").val() + "," + $("#maxlat").val();
+    var bboxArg = "bbox=" + $("#minlon").val() + "," + $("#minlat").val() + "," + $("#maxlon").val() + "," + $("#maxlat").val();
+    var overpassUrl = "http://overpass-api.de/api/map?" + bboxArg;
+    $("#overpass-export").attr('href', overpassUrl);
   }
 
   function validateControls() {
